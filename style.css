@@ -1,0 +1,57 @@
+td {
+        font-family: Verdana, Arial;
+        font-size: 16px;
+}
+
+body {  
+        font-family: Verdana, Arial;
+        font-size: 16px;
+}
+
+
+td.Highlight {
+        background-color: #DDDDDF;
+/*      border-top: 1px solid #999999; */
+}
+
+
+td.White {
+        background-color: #FFFFFF;
+/*      border-top: 1px solid #999999; */
+}
+
+
+td.Focus {
+        background-color: #000060;
+/*      border-top: 1px solid #999999; */
+}
+
+
+td.Line {
+        border-top: 1px solid #999999;
+}
+
+.Highlight {
+        background-color: #DDDDDF;
+        font-weight: bold;
+}
+
+.White {
+        background-color: #FFFFFF;
+        font-weight: bold;
+}
+
+th, td.Head {
+        color: #FFFFFF;
+        background-color: #000077;
+        background-image: url('Images/grad_white.png');
+        background-position: 0px -3px;
+        background-repeat: repeat-x;
+        vertical-align: bottom;
+        padding-left: 3px;
+        padding-right: 3px;
+        font-family: Arial;
+        font-size: 10px;
+        font-weight: bold;
+}
+
