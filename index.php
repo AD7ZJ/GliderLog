@@ -216,7 +216,10 @@ The format for entering times is very flexible - anything like "11:00", "1:00 PM
 <br>
 To Do Yet:<br>
 <ul>
-<li>Total Time not calculated correctly when row is initially entered. Times are stored internally in relation to the unix epoch, so a massively large negative value will initially be displayed.  
+<li>Need to add a modify button to modify existing entries
+<li>Need to add buttons to to the start and stop time columns to start and stop the timer
+<li>'other' entry in the aircraft column for visiting pilots (no air-time will be calculated for these)
+<li>Add columns for instructor and notes
 <li>Need to implement reports for billing, etc
 <li>Source code can be seen <a href="index.phps">here</a>
 <li>The sQlite database admin panel can be seen <a href="phpliteadmin.php">here</a>
