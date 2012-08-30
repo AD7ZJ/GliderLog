@@ -1,3 +1,4 @@
+<script LANGUAGE="JavaScript" type="text/javascript" src="clientScript.js"></script>
 <html>
 <head>
 <meta http-equiv="Content-Language" content="en-us">
@@ -100,7 +101,7 @@
 
     $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
     if($result = $database->query($query, SQLITE_BOTH, $error)) {
-	echo("<table border=\"1\">");
+	echo("<table id=\"flightLogTable\" border=\"1\">");
 	echo("<tr><td>Pilot</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td><td>Tow Height</td><td></td></tr>\n");
 
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
