@@ -1,4 +1,4 @@
-function testFunction() {
+function updateFlightTime() {
     var table = document.getElementById("flightLogTable");
 
     // run through the rows of the table
@@ -44,4 +44,5 @@ function pad(number, length) {
     return str;
 }
 
-setInterval(function(){testFunction()}, 500);
+// Run the update function every 500 ms
+setInterval(function(){updateFlightTime()}, 500);
