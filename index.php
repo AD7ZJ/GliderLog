@@ -77,6 +77,7 @@
 
 	if(!$result = $database->query($query, SQLITE_BOTH, $error)) {
             print("uh oh.... failed to update record :( $error");
+	    print $query;
 	}
 
     }
@@ -106,7 +107,7 @@
 
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
 	    if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || !$row['towHeight']) {
-                echo("<tr bgcolor=\"#FF0000\"><form name=\"loggingUpdate\" action=\"index.php\" method=\"POST\"> ");
+                echo("<tr id=\"row{$row['flightIndex']}\" bgcolor=\"#FF0000\"><form id=\"form{$row['flightIndex']}\" name=\"loggingUpdate\" action=\"index.php\" method=\"POST\"> ");
 		$entryComplete = false;
 	    }
 	    else {
@@ -129,14 +130,18 @@
 	    // Takeoff time
 	    if($row['takeoffTime'])
 		echo "<td>" . date("G:i:s", $row['takeoffTime']) . "</td>";
-	    else
-		echo "<td><input type=\"text\" name=\"takeoff\" /></td>";
+	    else {
+		echo "<td><input type=\"text\" name=\"takeoff\" id=\"takeoff{$row['flightIndex']}\"/>";
+		echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img alt='Start Now' src='brush_24.png' border='0'></a></td>";
+	    }
 
 	    // Landing time
 	    if($row['landingTime'])
 	        echo "<td>" . date("G:i:s", $row['landingTime']) . "</td>";
-	    else
-		echo "<td><input type=\"text\" name=\"landing\" /></td>";
+	    else {
+		echo "<td><input type=\"text\" name=\"landing\" id=\"landing{$row['flightIndex']}\" />";
+                echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img alt='Start Now' src='brush_24.png' border='0'></a></td>";
+            }
 
 	    // Flight Time
 	    $flightMins = round($row['totalTime'] / 60);

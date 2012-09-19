@@ -44,5 +44,15 @@ function pad(number, length) {
     return str;
 }
 
+function startTimer(flightIndex) {
+    document.getElementById("takeoff"+flightIndex).value = 'now';
+    document.getElementById("form"+flightIndex).submit();
+}
+
+function endTimer(flightIndex) {
+    document.getElementById("landing"+flightIndex).value = 'now';
+    document.getElementById("form"+flightIndex).submit();
+}
+
 // Run the update function every 500 ms
 setInterval(function(){updateFlightTime()}, 500);
