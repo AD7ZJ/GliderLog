@@ -132,7 +132,7 @@
 		echo "<td>" . date("G:i:s", $row['takeoffTime']) . "</td>";
 	    else {
 		echo "<td><input type=\"text\" name=\"takeoff\" id=\"takeoff{$row['flightIndex']}\"/>";
-		echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img alt='Start Now' src='brush_24.png' border='0'></a></td>";
+		echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='clock.png' border='0'></a></td>";
 	    }
 
 	    // Landing time
@@ -140,7 +140,7 @@
 	        echo "<td>" . date("G:i:s", $row['landingTime']) . "</td>";
 	    else {
 		echo "<td><input type=\"text\" name=\"landing\" id=\"landing{$row['flightIndex']}\" />";
-                echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img alt='Start Now' src='brush_24.png' border='0'></a></td>";
+                echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='clock.png' border='0'></a></td>";
             }
 
 	    // Flight Time
@@ -155,11 +155,11 @@
 
 	    // Submit button and hidden field containing the unique flight index
 	    if(!$entryComplete) {
-		echo "<td><input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" />";
-		echo "  <a href=deleteEntry.php?flightIndex={$row['flightIndex']}><img src=\"close_24.png\" /></a></td></form></tr>\n";
+		echo "<td><input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
+		echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" /></td></tr>\n";
 	    }
 	    else
-		echo "<td><center><a href=deleteEntry.php?flightIndex={$row['flightIndex']}><img src=\"close_24.png\" /></a></center></td></tr>\n";
+                echo "<td><center><button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" /></center></td></tr>\n";
 
         }
 

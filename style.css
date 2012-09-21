@@ -56,3 +56,12 @@ th, td.Head {
         font-weight: bold;
 }
 
+button.delete {
+        border: none;
+        height: 24px;
+        width: 24px;
+        valign: center;
+        background: transparent;
+        background-image: url('close_24.png');
+        background-position: center;
+}
