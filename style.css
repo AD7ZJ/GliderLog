@@ -9,6 +9,17 @@ body {
         background-image: url(Clouds.jpg);
 }
 
+.landingInput {
+        width: 80px
+}
+
+.takeoffInput {
+        width: 80px
+}
+
+.towInput {
+        width: 80px
+}
 
 td.Highlight {
         background-color: #DDDDDF;

@@ -26,6 +26,7 @@
     // hashes used to build option lists.  Eventually we should probably generate these from a database
     $aircraftList = array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
     $memberList = array( "", "Max Denney", "Greg Berger", "Rod Clark", "Scott Boynton", "Elijah Brown", "Dana", "Fred" );
+    $instructorList = array( "", "A.C. Goodwin" );
 
     // using the _REQUEST array allows input via HTTP POST or URL tags
     $day = date("j");
@@ -36,6 +37,7 @@
     $landing = strtotime($_REQUEST["landing"]);
     $towHeight = $_REQUEST["towHeight"];
     $billTo = $_REQUEST["billTo"];
+    $instructor = $_REQUEST["instructor"];
     $notes = $_REQUEST["notes"];
     $aircraft = $_REQUEST["aircraft"];
     $flightIndex = $_REQUEST["flightIndex"];
@@ -69,6 +71,13 @@
 
 	if($towHeight)
 	    $query .= "towHeight='$towHeight',";
+	
+	if($instructor)
+	    $query .= "instructor='$instructor',";
+
+	if($notes)
+	    $query .= "notes='$notes',";
+   
 
 	// trim any trailing commas off the string so far
 	$query = rtrim($query, ",");
@@ -86,8 +95,9 @@
 	if($takeoff && $landing) 
 	    $totalTime = $landing - $takeoff;
 	
-        $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo) " 
-                  . "VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', '$aircraft', '$takeoff', '$landing', '$totalTime', '$towHeight', '$billTo');";
+        $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo," 
+                  . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', '$aircraft', '$takeoff', '$landing', "
+                  . "'$totalTime', '$towHeight', '$billTo', '$instructor', '$notes');";
 
 	// before executing the query, check for duplicates
 	//FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
@@ -103,7 +113,8 @@
     $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
     if($result = $database->query($query, SQLITE_BOTH, $error)) {
 	echo("<table id=\"flightLogTable\" border=\"1\">");
-	echo("<tr><td>Pilot</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td><td>Tow Height</td><td></td></tr>\n");
+	echo("<tr><td>Bill To</td><td>Instructor/PIC</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
+	echo("<td>Tow Height</td><td>Notes</td><td></td></tr>\n");
 
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
 	    if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || !$row['towHeight']) {
@@ -118,6 +129,15 @@
 	    // Pilot
             echo("<td>{$memberList[$row['billTo']]}</td>");
 
+            // instructor
+	    if(!$row['instructor'] && !$row['takeoffTime']) {
+	        echo("<td>");
+		echo listInstructors();
+		echo "</td>";
+	    }
+	    else
+		echo("<td>{$instructorList[$row['instructor']]}</td>");
+
 	    // Glider
 	    if($row['aircraft'] == 0) {
 		echo "<td>";
@@ -131,7 +151,7 @@
 	    if($row['takeoffTime'])
 		echo "<td>" . date("G:i:s", $row['takeoffTime']) . "</td>";
 	    else {
-		echo "<td><input type=\"text\" name=\"takeoff\" id=\"takeoff{$row['flightIndex']}\"/>";
+		echo "<td><input type=\"text\" name=\"takeoff\" class=\"takeoffInput\" id=\"takeoff{$row['flightIndex']}\"/>";
 		echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='clock.png' border='0'></a></td>";
 	    }
 
@@ -139,7 +159,7 @@
 	    if($row['landingTime'])
 	        echo "<td>" . date("G:i:s", $row['landingTime']) . "</td>";
 	    else {
-		echo "<td><input type=\"text\" name=\"landing\" id=\"landing{$row['flightIndex']}\" />";
+		echo "<td><input type=\"text\" name=\"landing\" class=\"landingInput\" id=\"landing{$row['flightIndex']}\" />";
                 echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='clock.png' border='0'></a></td>";
             }
 
@@ -151,7 +171,10 @@
 	    if($row['towHeight'])
                 echo("<td>{$row['towHeight']}</td>");
 	    else
-		echo "<td><input type=\"text\" name=\"towHeight\" /></td>";
+		echo "<td><input type=\"text\" name=\"towHeight\" class=\"towInput\" /></td>";
+
+	    // notes
+	    echo "<td><input type=\"text\" name=\"notes\" value=\"{$row['notes']}\"/></td>";
 
 	    // Submit button and hidden field containing the unique flight index
 	    if(!$entryComplete) {
@@ -168,11 +191,14 @@
 	echo "<td>";
 	echo listPilots() . "</td>\n";
 	echo "<td>";
+	echo listInstructors() . "</td>\n";
+	echo "<td>";
 	echo listAircraft() . "</td>\n";
-	echo "<td><input type=\"text\" name=\"takeoff\" /></td>";
-	echo "<td><input type=\"text\" name=\"landing\" /></td>";
+	echo "<td><input type=\"text\" name=\"takeoff\" class=\"takeoffInput\" /></td>";
+	echo "<td><input type=\"text\" name=\"landing\" class=\"landingInput\" /></td>";
 	echo "<td>N/A</td>";
-	echo "<td><input type=\"text\" name=\"towHeight\" /></td>";
+	echo "<td><input type=\"text\" name=\"towHeight\" class=\"towInput\" /></td>";
+	echo "<td><input type=\"text\" name=\"notes\" /></td>";
 	echo "<td><input type=\"submit\" value=\"Submit\" /></td>";
 	echo "</form></tr>";
 	echo("</table><br><br><br>");
@@ -213,6 +239,15 @@ function listPilots() {
     echo "</select>";
 }
 
+function listInstructors() {
+    global $instructorList;
+    echo "<select name=\"instructor\">\n";
+    foreach($instructorList as $i => $value) {
+        echo "<option value=\"$i\">$value</option>\n";
+    }
+    echo "</select>";
+}
+
 ?>
 
 To begin the log for the day, only the pilot's name need be entered to begin with.  Rows will display with a red background until all data is complete.  When new data is entered, click the "Update..." button for the changes to take effect and be saved to the database.  The only real limitation is only a single row can be updated at a time, so don't go making a bunch of updates to 3 different people and then click update, as only the row whose update button was clicked will take effect.<br>
@@ -222,9 +257,7 @@ The format for entering times is very flexible - anything like "11:00", "1:00 PM
 To Do Yet:<br>
 <ul>
 <li>Need to add a modify button to modify existing entries
-<li>Need to add buttons to to the start and stop time columns to start and stop the timer
 <li>'other' entry in the aircraft column for visiting pilots (no air-time will be calculated for these)
-<li>Add columns for instructor and notes
 <li>Need to implement reports for billing, etc
 <li>Source code can be seen <a href="index.phps">here</a>
 <li>The sQlite database admin panel can be seen <a href="phpliteadmin.php">here</a>

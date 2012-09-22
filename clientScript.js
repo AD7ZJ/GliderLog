@@ -5,8 +5,8 @@ function updateFlightTime() {
     for(var i = 1, row; row = table.rows[i]; i++) {
         // Skip rows that already have a landing time entered or that do not yet have a takeoff time
         // we're triggering on the <input> tag that will be present if the field is not filled out
-        if(row.cells[3].innerHTML.match("input") && !row.cells[2].innerHTML.match("input")) {
-            var startTime = row.cells[2].innerHTML;
+        if(row.cells[4].innerHTML.match("input") && !row.cells[3].innerHTML.match("input")) {
+            var startTime = row.cells[3].innerHTML;
             var startTimeArray = startTime.split(":");
             var startHrs = startTimeArray[0];
             var startDate = new Date();
@@ -16,11 +16,11 @@ function updateFlightTime() {
             
             // set the background color of the cell
             if(totalTimeSeconds > 3600)
-                row.cells[4].style.backgroundColor = "FF0000";
+                row.cells[5].style.backgroundColor = "FF0000";
             else if(totalTimeSeconds > 3000)
-                row.cells[4].style.backgroundColor = "FFFF00";
+                row.cells[5].style.backgroundColor = "FFFF00";
             else
-                row.cells[4].style.backgroundColor = "008080";
+                row.cells[5].style.backgroundColor = "008080";
                 
             var flightTimeHours = Math.floor(totalTimeSeconds / 3600);
             totalTimeSeconds -= flightTimeHours * 3600;
@@ -28,10 +28,10 @@ function updateFlightTime() {
             totalTimeSeconds -= flightTimeMinutes * 60;
 
             // build elapsed flight time string
-            row.cells[4].innerHTML = "";
+            row.cells[5].innerHTML = "";
             if(flightTimeHours > 0)
-                row.cells[4].innerHTML += flightTimeHours + ":";
-            row.cells[4].innerHTML += pad(flightTimeMinutes, 2) + ":" + pad(totalTimeSeconds, 2);
+                row.cells[5].innerHTML += flightTimeHours + ":";
+            row.cells[5].innerHTML += pad(flightTimeMinutes, 2) + ":" + pad(totalTimeSeconds, 2);
         }
     }
 }
