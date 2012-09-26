@@ -76,3 +76,14 @@ button.delete {
         background-image: url('close_24.png');
         background-position: center;
 }
+
+button.modify {
+        border: none;
+        height: 24px;
+        width: 24px;
+        valign: center;
+        background: transparent;
+        background-image: url('modify.png');
+        background-position: center;
+}
+

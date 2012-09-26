@@ -41,11 +41,13 @@
     $notes = $_REQUEST["notes"];
     $aircraft = $_REQUEST["aircraft"];
     $flightIndex = $_REQUEST["flightIndex"];
+    $modified = $_REQUEST["modified"];
+
     
     // Calculate total flight time
     $totalTime = $landing - $takeoff;
 
-    if(isset($flightIndex)) {
+    if(isset($flightIndex) && !$modified) {
 	// update an existing record
 
 	// Get existing properties for this flight
@@ -117,7 +119,13 @@
 	echo("<td>Tow Height</td><td>Notes</td><td></td></tr>\n");
 
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
-	    if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || !$row['towHeight']) {
+	    $editMe = 0;
+	    // do we need to modify this row?
+	    if($flightIndex == $row['flightIndex'] && $modified) {
+		$editMe = 1;
+	    }
+
+	    if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || !$row['towHeight'] || $editMe) {
                 echo("<tr id=\"row{$row['flightIndex']}\" bgcolor=\"#FF0000\"><form id=\"form{$row['flightIndex']}\" name=\"loggingUpdate\" action=\"index.php\" method=\"POST\"> ");
 		$entryComplete = false;
 	    }
@@ -130,28 +138,29 @@
             echo("<td>{$memberList[$row['billTo']]}</td>");
 
             // instructor
-	    if(!$row['instructor'] && !$row['takeoffTime']) {
+	    if(!$row['instructor'] && !$row['takeoffTime'] || $editMe) {
 	        echo("<td>");
-		echo listInstructors();
+		echo listInstructors($row['instructor']);
 		echo "</td>";
 	    }
 	    else
 		echo("<td>{$instructorList[$row['instructor']]}</td>");
 
 	    // Glider
-	    if($row['aircraft'] == 0) {
+	    if($row['aircraft'] == 0 || $editMe) {
 		echo "<td>";
-		echo listAircraft();
+		echo listAircraft($row['aircraft']);
 		echo "</td>";
 	    }
 	    else
                 echo("<td>{$aircraftList[$row['aircraft']]}</td>");
 
 	    // Takeoff time
-	    if($row['takeoffTime'])
+	    if($row['takeoffTime'] && !$editMe)
 		echo "<td>" . date("G:i:s", $row['takeoffTime']) . "</td>";
 	    else {
-		echo "<td><input type=\"text\" name=\"takeoff\" class=\"takeoffInput\" id=\"takeoff{$row['flightIndex']}\"/>";
+		$storedTakeoffTime = date("G:i:s", $row['takeoffTime']);
+		echo "<td><input type=\"text\" name=\"takeoff\" value=\"$storedTakeoffTime\" class=\"takeoffInput\" id=\"takeoff{$row['flightIndex']}\"/>";
 		echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='clock.png' border='0'></a></td>";
 	    }
 
@@ -179,10 +188,15 @@
 	    // Submit button and hidden field containing the unique flight index
 	    if(!$entryComplete) {
 		echo "<td><input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
+		echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
 		echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" /></td></tr>\n";
 	    }
-	    else
-                echo "<td><center><button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" /></center></td></tr>\n";
+	    else {
+                echo "<td><center><button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />\n";
+
+		echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
+		echo "</center></td></tr>\n";
+	    }
 
         }
 
@@ -209,19 +223,14 @@
 /**
  * Builds an HTML option list of aircraft from the hash $aircraftList
  */
-function listAircraft() {
-//    <select name="aircraft">
-//         <option value="0"></option>
-//         <option value="1">SGS 1-26</option>
-//         <option value="2">SGS 2-33</option>
-//         <option value="3">SGS 1-34</option>
-//         <option value="4">Cirrus</option>
-//    </select>
-
+function listAircraft($selected = 0) {
     global $aircraftList;
     echo "<select name=\"aircraft\">\n";
     foreach($aircraftList as $i => $value) {
-	echo "<option value=\"$i\">$value</option>\n";
+	echo "<option value=\"$i\" ";
+	if($i == $selected)
+	    echo "selected=\"selected\"";
+	echo ">$value</option>\n";
     }
     echo "</select>";
 }
@@ -230,20 +239,26 @@ function listAircraft() {
 /**
  * Builds an HTML option list of members from the hash $memberList
  */
-function listPilots() {
+function listPilots($selected = 0) {
     global $memberList;
     echo "<select name=\"billTo\">\n";   
     foreach($memberList as $i => $value) {
-        echo "<option value=\"$i\">$value</option>\n";
+        echo "<option value=\"$i\" ";
+	if($i == $selected)
+	    echo "selected=\"selected\"";
+	echo ">$value</option>\n";
     }
     echo "</select>";
 }
 
-function listInstructors() {
+function listInstructors($selected = 0) {
     global $instructorList;
     echo "<select name=\"instructor\">\n";
     foreach($instructorList as $i => $value) {
-        echo "<option value=\"$i\">$value</option>\n";
+        echo "<option value=\"$i\" ";
+	if($i == $selected)
+            echo "selected=\"selected\"";
+	echo ">$value</option>\n";
     }
     echo "</select>";
 }
