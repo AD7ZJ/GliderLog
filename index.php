@@ -103,11 +103,7 @@
 
 	// before executing the query, check for duplicates
 	//FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
-        if($result = $database->query($query, SQLITE_BOTH, $error)) {
-	    print("Executed INSERT...");
-        }
-    
-        else
+        if(!$result = $database->query($query, SQLITE_BOTH, $error)) 
             print("uh oh.... :( $error $result");
     }
 
@@ -156,34 +152,46 @@
                 echo("<td>{$aircraftList[$row['aircraft']]}</td>");
 
 	    // Takeoff time
-	    if($row['takeoffTime'] && !$editMe)
-		echo "<td>" . date("G:i:s", $row['takeoffTime']) . "</td>";
-	    else {
+	    if($row['takeoffTime'])
 		$storedTakeoffTime = date("G:i:s", $row['takeoffTime']);
+
+	    if($row['takeoffTime'] && !$editMe)
+		echo "<td>$storedTakeoffTime</td>";
+	    else {
 		echo "<td><input type=\"text\" name=\"takeoff\" value=\"$storedTakeoffTime\" class=\"takeoffInput\" id=\"takeoff{$row['flightIndex']}\"/>";
 		echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='clock.png' border='0'></a></td>";
 	    }
+	    $storedTakeoffTime = "";
 
 	    // Landing time
 	    if($row['landingTime'])
-	        echo "<td>" . date("G:i:s", $row['landingTime']) . "</td>";
+		$storedLandingTime = date("G:i:s", $row['landingTime']);
+
+	    if($row['landingTime'] && !$editMe)
+	        echo "<td>$storedLandingTime</td>";
 	    else {
-		echo "<td><input type=\"text\" name=\"landing\" class=\"landingInput\" id=\"landing{$row['flightIndex']}\" />";
+		echo "<td><input type=\"text\" name=\"landing\" value=\"$storedLandingTime\" class=\"landingInput\" id=\"landing{$row['flightIndex']}\" />";
                 echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='clock.png' border='0'></a></td>";
             }
+	    $storedLandingTime = "";
 
 	    // Flight Time
 	    $flightMins = round($row['totalTime'] / 60);
 	    echo "<td>$flightMins Mins</td>";
 
 	    // Tow altitude
-	    if($row['towHeight'])
+	    if($row['towHeight'] && !$editMe)
                 echo("<td>{$row['towHeight']}</td>");
 	    else
-		echo "<td><input type=\"text\" name=\"towHeight\" class=\"towInput\" /></td>";
+		echo "<td><input type=\"text\" name=\"towHeight\" value=\"{$row['towHeight']}\" class=\"towInput\" /></td>";
 
 	    // notes
-	    echo "<td><input type=\"text\" name=\"notes\" value=\"{$row['notes']}\"/></td>";
+	    if(($row['notes'] && !$editMe) || $entryComplete) {
+		echo "<td style=\"width: 200px\">{$row['notes']}</td>";
+	    }
+	    else {
+		echo "<td><input type=\"text\" name=\"notes\" value=\"{$row['notes']}\"/></td>";
+	    }
 
 	    // Submit button and hidden field containing the unique flight index
 	    if(!$entryComplete) {
