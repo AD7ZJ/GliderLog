@@ -26,7 +26,7 @@
     // hashes used to build option lists.  Eventually we should probably generate these from a database
     $aircraftList = array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
     $memberList = array( "", "Max Denney", "Greg Berger", "Rod Clark", "Scott Boynton", "Elijah Brown", "Dana", "Fred" );
-    $instructorList = array( "", "A.C. Goodwin" );
+    $instructorList = array( "", "None", "A.C. Goodwin" );
 
     // using the _REQUEST array allows input via HTTP POST or URL tags
     $day = date("j");
@@ -74,8 +74,11 @@
 	if($towHeight)
 	    $query .= "towHeight='$towHeight',";
 	
-	if($instructor)
+	if($instructor) {
+	    if($instructor == 1) // 'none' was selected so clear it
+		$instructor = 0;
 	    $query .= "instructor='$instructor',";
+	}
 
 	if($notes)
 	    $query .= "notes='$notes',";
@@ -111,7 +114,7 @@
     $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
     if($result = $database->query($query, SQLITE_BOTH, $error)) {
 	echo("<table id=\"flightLogTable\" border=\"1\">");
-	echo("<tr><td>Bill To</td><td>Instructor/PIC</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
+	echo("<tr><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
 	echo("<td>Tow Height</td><td>Notes</td><td></td></tr>\n");
 
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
@@ -279,7 +282,6 @@ The format for entering times is very flexible - anything like "11:00", "1:00 PM
 <br>
 To Do Yet:<br>
 <ul>
-<li>Need to add a modify button to modify existing entries
 <li>'other' entry in the aircraft column for visiting pilots (no air-time will be calculated for these)
 <li>Need to implement reports for billing, etc
 <li>Source code can be seen <a href="index.phps">here</a>
