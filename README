@@ -1,0 +1,1 @@
+Simple web based flight logging designed specifically for gliders.  Uses sQlite for the database to store all collected data in.
