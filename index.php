@@ -10,23 +10,15 @@
 <center><h1>Flights for <?php echo date("F j, Y"); ?></h1></center>
 
 <?php
-    try {
-        //create or open the database
-        $dir = 'sqlite:myDatabase.sqlite';
-        $database = new PDO($dir) or die("cannot open the database");
-        // this crap with the PHP Data Objects is necessary because of a bug in the way PHP interfaces with SQLite
-    }
-    catch(Exception $e) {
-        die("Crap!! Couldn't open database :( $e");
-    }
+    include("SoaringLogBase.php");
 
-    // name of the table we'll be using
-    $tableName = "flightLog";
-
-    // hashes used to build option lists.  Eventually we should probably generate these from a database
-    $aircraftList = array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
-    $memberList = array( "", "Max Denney", "Greg Berger", "Rod Clark", "Scott Boynton", "Elijah Brown", "Dana", "Fred" );
-    $instructorList = array( "", "None", "A.C. Goodwin" );
+    // Initialize variable we'll be using from the database
+    $logbase = SoaringLogBase::GetInstance();
+    $database = $logbase->dbObj;
+    $tableName = $logbase->GetFlightLogTable(); 
+    $aircraftList = $logbase->GetAircraft(); 
+    $memberList = $logbase->GetMembers(); 
+    $instructorList = $logbase->GetInstructors(); 
 
     // using the _REQUEST array allows input via HTTP POST or URL tags
     $day = date("j");
@@ -47,65 +39,62 @@
     // Calculate total flight time
     $totalTime = $landing - $takeoff;
 
-    if(isset($flightIndex) && !$modified) {
 	// update an existing record
+    if(isset($flightIndex) && !$modified) {
+        // Get existing properties for this flight
+        $query = "SELECT * FROM $tableName WHERE flightIndex='$flightIndex';";
+            if($result = $database->query($query, SQLITE_BOTH, $error)) {
+                $row = $result->fetch(PDO::FETCH_BOTH); 
+        }
+        
 
-	// Get existing properties for this flight
-	$query = "SELECT * FROM $tableName WHERE flightIndex='$flightIndex';";
-    	if($result = $database->query($query, SQLITE_BOTH, $error)) {
-            $row = $result->fetch(PDO::FETCH_BOTH); 
-	}
-	
+        $query = "UPDATE $tableName SET ";
+        if($aircraft)
+            $query .= "aircraft='$aircraft',";
 
-	$query = "UPDATE $tableName SET ";
-	if($aircraft)
-	    $query .= "aircraft='$aircraft',";
+        if($takeoff)
+            $query .= "takeoffTime='$takeoff',";
 
-	if($takeoff)
-	    $query .= "takeoffTime='$takeoff',";
+        if($landing) {
+            $query .= "landingTime='$landing',";
+            // update the flight time
+            $totalTime = $landing - $row['takeoffTime'];
+            $query .= "totalTime='$totalTime',";
+        }
 
-	if($landing) {
-	    $query .= "landingTime='$landing',";
-	    // update the flight time
-	    $totalTime = $landing - $row['takeoffTime'];
-	    $query .= "totalTime='$totalTime',";
-	}
+        if($towHeight)
+            $query .= "towHeight='$towHeight',";
+        
+        if($instructor) {
+            if($instructor == 1) // 'none' was selected so clear it
+            $instructor = 0;
+            $query .= "instructor='$instructor',";
+        }
 
-	if($towHeight)
-	    $query .= "towHeight='$towHeight',";
-	
-	if($instructor) {
-	    if($instructor == 1) // 'none' was selected so clear it
-		$instructor = 0;
-	    $query .= "instructor='$instructor',";
-	}
+        if($notes)
+            $query .= "notes='$notes',";
+       
 
-	if($notes)
-	    $query .= "notes='$notes',";
-   
+        // trim any trailing commas off the string so far
+        $query = rtrim($query, ",");
+        
+        $query .= " WHERE flightIndex='$flightIndex';";
 
-	// trim any trailing commas off the string so far
-	$query = rtrim($query, ",");
-	
-	$query .= " WHERE flightIndex='$flightIndex';";
-
-	if(!$result = $database->query($query, SQLITE_BOTH, $error)) {
-            print("uh oh.... failed to update record :( $error");
-	    print $query;
-	}
-
+        if(!$result = $database->query($query, SQLITE_BOTH, $error)) {
+                print("uh oh.... failed to update record :( $error");
+            print $query;
+        }
     }
     else if(isset($billTo)) {
-	// add a new entry
-	if($takeoff && $landing) 
-	    $totalTime = $landing - $takeoff;
-	
+        // add a new entry
+        if($takeoff && $landing) 
+            $totalTime = $landing - $takeoff;
+        
         $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo," 
                   . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', '$aircraft', '$takeoff', '$landing', "
                   . "'$totalTime', '$towHeight', '$billTo', '$instructor', '$notes');";
 
-	// before executing the query, check for duplicates
-	//FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
+        //FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
         if(!$result = $database->query($query, SQLITE_BOTH, $error)) 
             print("uh oh.... query failed :( $error $result");
     }

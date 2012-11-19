@@ -7,9 +7,12 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-
-
+	
 <?php
+/*
+ * Reports page
+ *
+ */
     try {
         //create or open the database
         $dir = 'sqlite:../myDatabase.sqlite';
@@ -46,6 +49,20 @@
 
 
     if($billTo) {
+		outputPilotTime();
+    }
+    else
+	    print("Failed to execute query: $query  Sucks to be you! $error");
+
+
+
+function outputPilotTime() {
+    global $database;
+    global $tableName;
+    global $billTo;
+    global $aircraftList;
+    global $memberList;
+    global $instructorList;
 	$query = "SELECT * FROM $tableName WHERE billTo='$billTo';";
 	if($result = $database->query($query, SQLITE_BOTH, $error)) {
 	    echo("<table id=\"flightLogTable\" border=\"1\">");
@@ -54,54 +71,55 @@
 
 	    $currentDOY = 0;
 	    $totalTime = 0; // flight time in seconds
-            while($row = $result->fetch(PDO::FETCH_BOTH)) {
-		// don't print if there's no takeoff time
-		if($row['takeoffTime']) {
-		if(date("z", $row['takeoffTime']) ==  $currentDOY) {
-	    	    echo("<tr>");
-		}
-		else {
-		    echo("<tr bgcolor=\"#6496FF\"><td colspan=\"8\">");
-		    echo date("F j, Y", $row['takeoffTime']);
-		    echo("</td></tr><tr>");
-		}
-	    	echo("<td>{$memberList[$row['billTo']]}</td>");
-	    	echo("<td>{$instructorList[$row['instructor']]}</td>");
-	    	echo("<td>{$aircraftList[$row['aircraft']]}</td>");
-	    	if($row['takeoffTime'])
-		    $storedTakeoffTime = date("G:i:s", $row['takeoffTime']);
-		else
-		    $storedTakeoffTime = "None Available";
-	    	echo("<td>$storedTakeoffTime</td>");
-	
-	    	if($row['landingTime']) {
-		    $totalTime += $row['landingTime'] - $row['takeoffTime'];
-		    $flightMins = round(($row['landingTime'] - $row['takeoffTime']) / 60);
-		    $storedLandingTime = date("G:i:s", $row['landingTime']);
-		}
-	    	else
-		    $storedLandingTime = "None Available";
-	    	echo("<td>$storedLandingTime</td>");
+        while($row = $result->fetch(PDO::FETCH_BOTH)) {
+            // don't print if there's no takeoff time
+            if($row['takeoffTime']) {
+                if(date("z", $row['takeoffTime']) ==  $currentDOY) {
+                    echo("<tr>");
+                }
+                else {
+                    echo("<tr bgcolor=\"#6496FF\"><td colspan=\"8\">");
+                    echo date("F j, Y", $row['takeoffTime']);
+                    echo("</td></tr><tr>");
+                }
 
-	    	echo("<td>$flightMins Mins</td>");
-	    	echo("<td>{$row['towHeight']}</td>");
-	    	echo("<td style=\"width: 200px\">{$row['notes']}</td>");
+                echo("<td>{$memberList[$row['billTo']]}</td>");
+                echo("<td>{$instructorList[$row['instructor']]}</td>");
+                echo("<td>{$aircraftList[$row['aircraft']]}</td>");
 
-	    	$storedLandingTime = "";
-	    	$storedTakeoffTime = "";
-		// update the current day of year
-		$currentDOY = date("z", $row['takeoffTime']);
+                if($row['takeoffTime'])
+                    $storedTakeoffTime = date("G:i:s", $row['takeoffTime']);
+                else
+                    $storedTakeoffTime = "None Available";
+                echo("<td>$storedTakeoffTime</td>");
+            
+                if($row['landingTime']) {
+                    $totalTime += $row['landingTime'] - $row['takeoffTime'];
+                    $flightMins = round(($row['landingTime'] - $row['takeoffTime']) / 60);
+                    $storedLandingTime = date("G:i:s", $row['landingTime']);
+                }
+                else
+                    $storedLandingTime = "None Available";
+                echo("<td>$storedLandingTime</td>");
 
-	    	echo "</tr>";
-		}
+                echo("<td>$flightMins Mins</td>");
+                echo("<td>{$row['towHeight']}</td>");
+                    echo("<td style=\"width: 200px\">{$row['notes']}</td>");
+
+                $storedLandingTime = "";
+                $storedTakeoffTime = "";
+                // update the current day of year
+                $currentDOY = date("z", $row['takeoffTime']);
+
+                    echo "</tr>";
             }
+        }
 	    echo "</table>";
-	    echo "<br><b>Total flight time for selected period: " . round($totalTime / 3600, 1) . "</b>";
-    	}
-    	else
-	    print("Failed to execute query: $query  Sucks to be you! $error");
-
-    }
+	    echo "<br><b>Total flight time for selected period: " . round($totalTime / 3600, 1) . "</b>";	
+	
+	
+	}
+}
 
 /**
  * Builds an HTML option list of aircraft from the hash $aircraftList
