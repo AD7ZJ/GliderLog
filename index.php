@@ -128,7 +128,7 @@
             // instructor
 	    if(!$row['instructor'] && !$row['takeoffTime'] || $editMe) {
 	        echo("<td>");
-		echo listInstructors($row['instructor']);
+		echo $logbase->PrintInstructors($row['instructor']);
 		echo "</td>";
 	    }
 	    else
@@ -137,7 +137,7 @@
 	    // Glider
 	    if($row['aircraft'] == 0 || $editMe) {
 		echo "<td>";
-		echo listAircraft($row['aircraft']);
+		echo $logbase->PrintAircraft($row['aircraft']);
 		echo "</td>";
 	    }
 	    else
@@ -203,11 +203,11 @@
 	// Row for new entries...
 	echo "<tr><form name=\"logging\" action=\"index.php\" method=\"POST\">\n";
 	echo "<td>";
-	echo listPilots() . "</td>\n";
+	echo $logbase->PrintPilots() . "</td>\n";
 	echo "<td>";
-	echo listInstructors() . "</td>\n";
+	echo $logbase->PrintInstructors() . "</td>\n";
 	echo "<td>";
-	echo listAircraft() . "</td>\n";
+	echo $logbase->PrintAircraft() . "</td>\n";
 	echo "<td><input type=\"text\" name=\"takeoff\" class=\"takeoffInput\" /></td>";
 	echo "<td><input type=\"text\" name=\"landing\" class=\"landingInput\" /></td>";
 	echo "<td>N/A</td>";
@@ -220,36 +220,6 @@
     else
 	print("Failed to execute query!!!  Sucks to be you! $error");
 
-/**
- * Builds an HTML option list of aircraft from the hash $aircraftList
- */
-function listAircraft($selected = 0) {
-    global $aircraftList;
-    echo "<select name=\"aircraft\">\n";
-    foreach($aircraftList as $i => $value) {
-	echo "<option value=\"$i\" ";
-	if($i == $selected)
-	    echo "selected=\"selected\"";
-	echo ">$value</option>\n";
-    }
-    echo "</select>";
-}
-
-
-/**
- * Builds an HTML option list of members from the hash $memberList
- */
-function listPilots($selected = 0) {
-    global $memberList;
-    echo "<select name=\"billTo\">\n";   
-    foreach($memberList as $i => $value) {
-        echo "<option value=\"$i\" ";
-	if($i == $selected)
-	    echo "selected=\"selected\"";
-	echo ">$value</option>\n";
-    }
-    echo "</select>";
-}
 
 function listInstructors($selected = 0) {
     global $instructorList;
