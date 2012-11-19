@@ -107,7 +107,7 @@
 	// before executing the query, check for duplicates
 	//FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
         if(!$result = $database->query($query, SQLITE_BOTH, $error)) 
-            print("uh oh.... :( $error $result");
+            print("uh oh.... query failed :( $error $result");
     }
 
 
