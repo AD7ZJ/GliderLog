@@ -1,6 +1,9 @@
-td {
+table, td, th {
         font-family: Verdana, Arial;
         font-size: 16px;
+        border: 0px solid black;
+        border-collapse:collapse; 
+        padding-left: 20px
 }
 
 body {  
@@ -21,17 +24,11 @@ body {
         width: 80px
 }
 
-td.Highlight {
-        background-color: #DDDDDF;
-/*      border-top: 1px solid #999999; */
+tr.Highlight {
+        background-color: #6496FF;
+        padding-left: 0px;
+/*        border-top: 1px solid #999999; #6496FF*/
 }
-
-
-td.White {
-        background-color: #FFFFFF;
-/*      border-top: 1px solid #999999; */
-}
-
 
 td.Focus {
         background-color: #000060;
@@ -39,7 +36,8 @@ td.Focus {
 }
 
 
-td.Line {
+tr.Data {
+        background-color: #DDDDDF;
         border-top: 1px solid #999999;
 }
 
@@ -56,14 +54,14 @@ td.Line {
 th, td.Head {
         color: #FFFFFF;
         background-color: #000077;
-        background-image: url('Images/grad_white.png');
+        background-image: url('grad_white.png');
         background-position: 0px -3px;
         background-repeat: repeat-x;
         vertical-align: bottom;
-        padding-left: 3px;
+        padding-left: 20px;
         padding-right: 3px;
-        font-family: Arial;
-        font-size: 10px;
+        font-family: Verdana, Arial;
+        font-size: 14px;
         font-weight: bold;
 }
 

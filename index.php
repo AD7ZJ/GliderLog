@@ -102,7 +102,7 @@
 
     $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
     if($result = $database->query($query, SQLITE_BOTH, $error)) {
-	echo("<table id=\"flightLogTable\" border=\"1\">");
+	echo("<table id=\"flightLogTable\" >");
 	echo("<tr><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
 	echo("<td>Tow Height</td><td>Notes</td><td></td></tr>\n");
 
@@ -219,19 +219,6 @@
     }
     else
 	print("Failed to execute query!!!  Sucks to be you! $error");
-
-
-function listInstructors($selected = 0) {
-    global $instructorList;
-    echo "<select name=\"instructor\">\n";
-    foreach($instructorList as $i => $value) {
-        echo "<option value=\"$i\" ";
-	if($i == $selected)
-            echo "selected=\"selected\"";
-	echo ">$value</option>\n";
-    }
-    echo "</select>";
-}
 
 ?>
 

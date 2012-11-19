@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Prescott Soaring Flight Reports</title>
-<link rel="stylesheet" type="text/css" href="style.css" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="stylesheet" type="text/css" media="all" href="jsDatePick_ltr.min.css" />
 <script type="text/javascript" src="jsDatePick.min.1.3.js"></script>
 <script type="text/javascript">
@@ -52,10 +52,24 @@ $flightIndex = $_REQUEST["flightIndex"];
 $startDate = strtotime($_REQUEST["startDate"]); // Times are stored in seconds after the unix epoch
 $endDate = strtotime($_REQUEST["endDate"]);
 
-
+/************ Display flights by pilot ***********/
 echo("Select Pilot's Name: ");
 echo("<form action=\"index.php\" method=\"POST\"> ");
-echo($logbase->PrintPilots());
+if($billTo)
+    echo($logbase->PrintPilots($billTo));
+else
+    echo($logbase->PrintPilots());
+echo("<input type=\"text\" size=\"12\" id=\"startDate\" name=\"startDate\" />");
+echo("<input type=\"text\" size=\"12\" id=\"endDate\" name=\"endDate\" />");
+echo("<input type=\"submit\" value=\"Go!\" /></form>");
+
+/************ Display flights by aircraft ***********/
+echo("Select Aircraft: ");
+echo("<form action=\"index.php\" method=\"POST\"> ");
+if($aircraft)
+    echo($logbase->PrintAircraft($aircraft));
+else
+    echo($logbase->PrintAircraft());
 echo("<input type=\"text\" size=\"12\" id=\"startDate\" name=\"startDate\" />");
 echo("<input type=\"text\" size=\"12\" id=\"endDate\" name=\"endDate\" />");
 echo("<input type=\"submit\" value=\"Go!\" /></form>");
@@ -84,8 +98,16 @@ function outputPilotTime() {
 
 	if($result = $database->query($query, SQLITE_BOTH, $error)) {
 	    echo("<table id=\"flightLogTable\" border=\"1\">");
-	    echo("<tr><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
-	    echo("<td>Tow Height</td><td>Notes</td></tr>\n");
+	    echo("<tr>");
+        echo("<td class=\"Head\">Bill To</td>");
+        echo("<td class=\"Head\">Instructor</td>");
+        echo("<td class=\"Head\">Aircraft</td>");
+        echo("<td class=\"Head\">Takeoff Time</td>");
+        echo("<td class=\"Head\">Landing Time</td>");
+        echo("<td class=\"Head\">Flight Time</td>");
+	    echo("<td class=\"Head\">Tow Height</td>");
+        echo("<td class=\"Head\">Notes</td>");
+        echo("</tr>\n");
 
 	    $currentDOY = 0;
 	    $totalTime = 0; // flight time in seconds
@@ -93,12 +115,12 @@ function outputPilotTime() {
             // don't print if there's no takeoff time
             if($row['takeoffTime']) {
                 if(date("z", $row['takeoffTime']) ==  $currentDOY) {
-                    echo("<tr>");
+                    echo("<tr class=\"Data\">");
                 }
                 else {
-                    echo("<tr bgcolor=\"#6496FF\"><td colspan=\"8\">");
+                    echo("<tr class=\"Highlight\"><td colspan=\"8\">");
                     echo date("F j, Y", $row['takeoffTime']);
-                    echo("</td></tr><tr>");
+                    echo("</td></tr><tr class=\"Data\">");
                 }
 
                 echo("<td>{$memberList[$row['billTo']]}</td>");
@@ -133,7 +155,7 @@ function outputPilotTime() {
             }
         }
 	    echo "</table>";
-	    echo "<br><b>Total flight time for selected period: " . round($totalTime / 3600, 1) . "</b>";	
+	    echo "<br><b>Total flight time for $memberList[$billTo] over the displayed period: " . round($totalTime / 3600, 1) . "</b>";	
 	
 	
 	}
