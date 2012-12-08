@@ -10,15 +10,30 @@
     window.onload = function(){
         new JsDatePick({
             useMode:2,
-            target:"startDate",
+            target:"startDatePilot",
             dateFormat:"%d-%M-%Y"
         });
         new JsDatePick({
             useMode:2,
-            target:"endDate",
+            target:"endDatePilot",
             dateFormat:"%d-%M-%Y"
         });
 
+        new JsDatePick({
+            useMode:2,
+            target:"startDateA",
+            dateFormat:"%d-%M-%Y"
+        });
+        new JsDatePick({
+            useMode:2,
+            target:"endDateA",
+            dateFormat:"%d-%M-%Y"
+        });
+        new JsDatePick({
+            useMode:2,
+            target:"flyingDay",
+            dateFormat:"%d-%M-%Y"
+        });
 
     };
 </script>
@@ -49,64 +64,124 @@ $billTo = $_REQUEST["billTo"];
 $instructor = $_REQUEST["instructor"];
 $aircraft = $_REQUEST["aircraft"];
 $flightIndex = $_REQUEST["flightIndex"];
-$startDate = strtotime($_REQUEST["startDate"]); // Times are stored in seconds after the unix epoch
-$endDate = strtotime($_REQUEST["endDate"]);
+// only one of these can be set at a time
+$startDate = strtotime($_REQUEST["startDateP"]); // Times are stored in seconds after the unix epoch
+$endDate = strtotime($_REQUEST["endDateP"]);
+$flyingDay = strtotime($_REQUEST["flyingDay"]);
+
+
+if(!$startDate)
+    $startDate = strtotime($_REQUEST["startDateA"]); // Times are stored in seconds after the unix epoch
+if(!$endDate)
+    $endDate = strtotime($_REQUEST["endDateA"]);
+
 
 /************ Display flights by pilot ***********/
-echo("Select Pilot's Name: ");
-echo("<form action=\"index.php\" method=\"POST\"> ");
+echo("<form action=\"index.php\" method=\"POST\">");
+echo("<table><tr>");
+echo("<td class=\"Heading\" colspan=\"4\">Flight times by pilot<br><br></td>");
+echo("</tr><tr>");
+echo("<td>Select Pilot's Name:</td>");
+echo("<td>Start date</td>");
+echo("<td>End date</td>");
+echo("<td></td>");
+echo("</tr><tr>");
+echo("<td>");
 if($billTo)
     echo($logbase->PrintPilots($billTo));
 else
     echo($logbase->PrintPilots());
-echo("<input type=\"text\" size=\"12\" id=\"startDate\" name=\"startDate\" />");
-echo("<input type=\"text\" size=\"12\" id=\"endDate\" name=\"endDate\" />");
-echo("<input type=\"submit\" value=\"Go!\" /></form>");
+echo("</td>");
+echo("<td><input type=\"text\" size=\"12\" id=\"startDatePilot\" name=\"startDateP\" /></td>");
+echo("<td><input type=\"text\" size=\"12\" id=\"endDatePilot\" name=\"endDateP\" /></td>");
+echo("<td><input type=\"submit\" value=\"Go!\" /></td>");
+echo("</tr></table>");
+echo("</form>");
 
 /************ Display flights by aircraft ***********/
-echo("Select Aircraft: ");
 echo("<form action=\"index.php\" method=\"POST\"> ");
+echo("<table>");
+echo("<tr>");
+echo("<td class=\"Heading\" colspan=\"4\">Flight times by aircraft<br><br></td>");
+echo("</tr><tr>");
+echo("<td>Select Aircraft:</td>");
+echo("<td>Start date</td>");
+echo("<td>End date</td>");
+echo("<td></td>");
+echo("</tr><tr>");
+echo("<td>");
 if($aircraft)
     echo($logbase->PrintAircraft($aircraft));
 else
     echo($logbase->PrintAircraft());
-echo("<input type=\"text\" size=\"12\" id=\"startDate\" name=\"startDate\" />");
-echo("<input type=\"text\" size=\"12\" id=\"endDate\" name=\"endDate\" />");
-echo("<input type=\"submit\" value=\"Go!\" /></form>");
+echo("</td>");
+echo("<td><input type=\"text\" size=\"12\" id=\"startDateA\" name=\"startDateA\" /></td>");
+echo("<td><input type=\"text\" size=\"12\" id=\"endDateA\" name=\"endDateA\" /></td>");
+echo("<td><input type=\"submit\" value=\"Go!\" /></td>");
+echo("</tr></table>");
+echo("</form>");
+
+echo("<form action=\"index.php\" method=\"POST\"> ");
+echo("<table>");
+echo("<tr>");
+echo("<td class=\"Heading\" colspan=\"2\">Flights by day<br><br></td>");
+echo("</tr><tr>");
+echo("<td>Select flying day:</td>");
+echo("</tr><tr>");
+echo("<td><input type=\"text\" size=\"12\" id=\"flyingDay\" name=\"flyingDay\" /></td>");
+echo("<td><input type=\"submit\" value=\"Go!\" /></td>");
+echo("</tr></table>");
+echo("</form>");
+
+
+
+/************ Display flights by day ***********/
 
 
 if($billTo) {
-    outputPilotTime();
-}
-
-
-function outputPilotTime() {
-    global $database;
-    global $tableName;
-    global $billTo;
-    global $aircraftList;
-    global $memberList;
-    global $instructorList;
-    global $startDate;
-    global $endDate;
-
     if($startDate) {
         $query = "SELECT * FROM $tableName WHERE billTo='$billTo' AND takeoffTime >= '$startDate' AND takeoffTime <= '$endDate';";
     }
-    else 
+    else
         $query = "SELECT * FROM $tableName WHERE billTo='$billTo';";
+
+    OutputQueryResults($query);
+}
+
+if($aircraft) {
+    if($startDate) {
+        $query = "SELECT * FROM $tableName WHERE aircraft='$aircraft' AND takeoffTime >= '$startDate' AND takeoffTime <= '$endDate';";
+    }
+    else
+        $query = "SELECT * FROM $tableName WHERE aircraft='$aircraft';";
+
+    OutputQueryResults($query);
+}
+
+if($flyingDay) {
+    $endTime = $flyingDay + 86400;
+    $query = "SELECT * FROM $tableName WHERE takeoffTime >= '$flyingDay' AND takeoffTime < '$endTime';";
+    OutputQueryResults($query);
+}
+
+
+function OutputQueryResults($query = "") {
+    global $database;
+    global $aircraftList;
+    global $memberList;
+    global $instructorList;
 
 	if($result = $database->query($query, SQLITE_BOTH, $error)) {
 	    echo("<table id=\"flightLogTable\" border=\"1\">");
-	    echo("<tr>");
-        echo("<td class=\"Head\">Bill To</td>");
-        echo("<td class=\"Head\">Instructor</td>");
-        echo("<td class=\"Head\">Aircraft</td>");
-        echo("<td class=\"Head\">Takeoff Time</td>");
-        echo("<td class=\"Head\">Landing Time</td>");
-        echo("<td class=\"Head\">Flight Time</td>");
-	    echo("<td class=\"Head\">Tow Height</td>");
-        echo("<td class=\"Head\">Notes</td>");
+	    echo("<tr class=\"Head\">");
+        echo("<td >Bill To</td>");
+        echo("<td >Instructor</td>");
+        echo("<td >Aircraft</td>");
+        echo("<td >Takeoff Time</td>");
+        echo("<td >Landing Time</td>");
+        echo("<td >Flight Time</td>");
+	    echo("<td >Tow Height</td>");
+        echo("<td >Notes</td>");
         echo("</tr>\n");
 
 	    $currentDOY = 0;
@@ -148,6 +223,7 @@ function outputPilotTime() {
 
                 $storedLandingTime = "";
                 $storedTakeoffTime = "";
+                $flightMins = 0;
                 // update the current day of year
                 $currentDOY = date("z", $row['takeoffTime']);
 

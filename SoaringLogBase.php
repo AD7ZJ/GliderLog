@@ -47,8 +47,15 @@
         }
 
         public function GetMembers() {
-            return array( "", "Max Denney", "Greg Berger", "Rod Clark", "Scott Boynton", "Elijah Brown", "Dana", "Fred" );
+            $query = "SELECT * FROM pilots;";
+            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
 
+            $memberList = array( );
+            while($row = $result->fetch(PDO::FETCH_BOTH)) {
+                $memberList[$row['ID']] = $row['Name'];
+            }
+            
+            return $memberList;
         }
 
         public function GetInstructors() {

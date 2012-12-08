@@ -30,14 +30,25 @@ tr.Highlight {
 /*        border-top: 1px solid #999999; #6496FF*/
 }
 
-td.Focus {
-        background-color: #000060;
-/*      border-top: 1px solid #999999; */
+td.Heading {
+        padding-left: 0px;
+        padding-top: 20px;
+        font-weight: bold;
 }
 
 
 tr.Data {
         background-color: #DDDDDF;
+        border-top: 1px solid #999999;
+}
+
+tr.IncompleteEntry {
+        background-color: #FF0000;
+        border-top: 1px solid #999999;
+}
+
+tr.CompleteEntry {
+        background-color: #00FF00;
         border-top: 1px solid #999999;
 }
 
@@ -51,7 +62,7 @@ tr.Data {
         font-weight: bold;
 }
 
-th, td.Head {
+th, tr.Head {
         color: #FFFFFF;
         background-color: #000077;
         background-image: url('grad_white.png');
