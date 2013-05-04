@@ -8,6 +8,9 @@
         
         // name of the database table used to store the flight time information
         private $flightLogTable = "flightLog";
+
+        // name of the database table used to store the member list in
+        private $pilotTable = "pilots";
     
         /******************** Public properties ********************/
         public $dbObj;
@@ -41,6 +44,11 @@
     
         }
 
+        public function GetPilotTable() {
+            return $this->pilotTable;
+
+        }
+
         public function GetAircraft() {
             return array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
 
@@ -56,6 +64,19 @@
             }
             
             return $memberList;
+        }
+
+        /**
+         * returns the timestamp of when the specified pilot last flew
+         *
+         * @param ID of pilot to check
+         */
+        public function GetLastFlew($id) {
+            $query = "SELECT * FROM flightLog WHERE billTo='$id' ORDER BY flightIndex DESC LIMIT 1;";
+            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
+
+            $row = $result->fetch(PDO::FETCH_BOTH);
+            return $row['takeoffTime'];
         }
 
         public function GetInstructors() {

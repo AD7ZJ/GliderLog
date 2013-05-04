@@ -40,20 +40,22 @@ $modified = $_REQUEST["modified"];
 $totalTime = $landing - $takeoff;
 
 // update an existing record
-if(isset($flightIndex) && !$modified) {
+if($flightIndex && !$modified) {
     // Get existing properties for this flight
     $query = "SELECT * FROM $tableName WHERE flightIndex='$flightIndex';";
     if($result = $database->query($query, SQLITE_BOTH, $error)) {
         $row = $result->fetch(PDO::FETCH_BOTH); 
     }
 
-
     $query = "UPDATE $tableName SET ";
     if($aircraft)
         $query .= "aircraft='$aircraft',";
 
-    if($takeoff)
+    if($takeoff) {
         $query .= "takeoffTime='$takeoff',";
+        $totalTime = $row['landingTime'] - $takeoff;
+        $query .= "totalTime='$totalTime',";
+    }
 
     if($landing) {
         $query .= "landingTime='$landing',";
@@ -85,7 +87,7 @@ if(isset($flightIndex) && !$modified) {
         print $query;
     }
 }
-else if(isset($billTo)) {
+else if($billTo) {
     // add a new entry
     if($takeoff && $landing) 
         $totalTime = $landing - $takeoff;
