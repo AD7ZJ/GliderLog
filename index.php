@@ -47,6 +47,9 @@ if($flightIndex && !$modified) {
         $row = $result->fetch(PDO::FETCH_BOTH); 
     }
 
+    // get the pilot's name for later use
+    $pilotName = $row['billTo'];
+
     $query = "UPDATE $tableName SET ";
     if($aircraft)
         $query .= "aircraft='$aircraft',";
@@ -86,19 +89,16 @@ if($flightIndex && !$modified) {
         print("uh oh.... failed to update record :( $error");
         print $query;
     }
+
+    // is this entry complete?
+    if($logbase->EntryIsComplete($flightIndex)) {
+        // Add the person to the bottom of the list
+        AddEntry($pilotName);
+    }
 }
 else if($billTo) {
-    // add a new entry
-    if($takeoff && $landing) 
-        $totalTime = $landing - $takeoff;
-
-    $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo," 
-        . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', '$aircraft', '$takeoff', '$landing', "
-        . "'$totalTime', '$towHeight', '$billTo', '$instructor', '$notes');";
-
-    //FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
-    if(!$result = $database->query($query, SQLITE_BOTH, $error)) 
-        print("uh oh.... query failed :( $error $result");
+    // Add a pilot to the list
+    AddEntry($billTo);
 }
 
 
@@ -207,21 +207,31 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo "<tr><form name=\"logging\" action=\"index.php\" method=\"POST\">\n";
     echo "<td>";
     echo $logbase->PrintPilots() . "</td>\n";
-    echo "<td>";
-    echo $logbase->PrintInstructors() . "</td>\n";
-    echo "<td>";
-    echo $logbase->PrintAircraft() . "</td>\n";
-    echo "<td><input type=\"text\" name=\"takeoff\" class=\"takeoffInput\" /></td>";
-    echo "<td><input type=\"text\" name=\"landing\" class=\"landingInput\" /></td>";
-    echo "<td>N/A</td>";
-    echo "<td><input type=\"text\" name=\"towHeight\" class=\"towInput\" /></td>";
-    echo "<td><input type=\"text\" name=\"notes\" /></td>";
+    echo "<td colspan=\"7\">Add a name to enter these fields</td>";
     echo "<td><input type=\"submit\" value=\"Submit\" /></td>";
     echo "</form></tr>";
     echo("</table><br><br><br>");
 }
 else
 print("Failed to execute query!!!  Sucks to be you! $error");
+
+
+function AddEntry($billTo) {
+    global $tableName, $day, $month, $year, $dayOfYear, $database;
+    
+    if($takeoff && $landing)
+        $totalTime = $landing - $takeoff;
+
+    $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo,"
+        . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', NULL, NULL, NULL, "
+        . "NULL, NULL, '$billTo', NULL, NULL);";
+
+    //FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
+    if(!$result = $database->query($query, SQLITE_BOTH, $error))
+        print("uh oh.... query failed :( $error $result");
+
+
+}
 
 ?>
 

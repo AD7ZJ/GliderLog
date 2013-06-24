@@ -143,6 +143,39 @@
             $output .= "</select>";
             return $output;
         }
-    
+
+        /**
+         * Returns true if the flight entry is complete, false otherwise
+         *
+         * @param $flightIndex database index for the entry to check
+         */    
+        public function EntryIsComplete($flightIndex = 0) {
+            $query = "SELECT * FROM flightLog WHERE flightIndex='$flightIndex';";
+            if($result = $this->dbObj->query($query, SQLITE_BOTH, $error)) {
+                $row = $result->fetch(PDO::FETCH_BOTH);
+
+                if($row['aircraft'] && $row['takeoffTime'] && $row['landingTime'] && $row['towHeight']) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Delete the selected entry from the database
+         *
+         * @param $flightIndex database index for the entry to delete
+         */
+        public function DeleteEntry($flightIndex = 0) {
+            if($flightIndex != 0) {
+                $query = "DELETE FROM flightLog WHERE flightIndex='$flightIndex';";
+                if($result = $this->dbObj->query($query, SQLITE_BOTH, $error)) 
+                    return true;
+                else {
+                    print("Failed to execute query!!! $error");
+                    return false;
+                }
+            }
+        }
     }
 ?>
