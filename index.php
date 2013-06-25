@@ -7,6 +7,14 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
+<div id="navbar">
+<ul>
+<li><a href="index.php">Logging Home</a></li>
+<li><a href="reports/index.php">Reports Page</a></li>
+<li><a href="http://prescottsoaring.com">Add Pilots/Aircraft</a></li>
+<li><a href="http://prescottsoaring.com">Back to PSS Homepage</a></li>
+</ul>
+</div>
 <center><h1>Flights for <?php echo date("F j, Y"); ?></h1></center>
 
 <?php
@@ -34,6 +42,12 @@ $notes = $_REQUEST["notes"];
 $aircraft = $_REQUEST["aircraft"];
 $flightIndex = $_REQUEST["flightIndex"];
 $modified = $_REQUEST["modified"];
+
+// force the time to assume PM if the hour is between 00:00 and 06:00
+if(date("G", $takeoff) < 6)
+    $takeoff += 43200;
+if(date("G", $landing) < 6)
+    $landing += 43200;
 
 
 // Calculate total flight time
@@ -178,7 +192,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
         if($row['towHeight'] && !$editMe)
             echo("<td>{$row['towHeight']}</td>");
         else
-            echo "<td><input type=\"text\" name=\"towHeight\" value=\"{$row['towHeight']}\" class=\"towInput\" /></td>";
+            echo "<td><input type=\"number\" name=\"towHeight\" value=\"{$row['towHeight']}\" class=\"towInput\" /></td>";
 
         // notes
         if(($row['notes'] && !$editMe) || $entryComplete) {

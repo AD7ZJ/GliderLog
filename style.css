@@ -12,6 +12,16 @@ body {
         background-image: url(Clouds.jpg);
 }
 
+
+/* ------------------------------
+ * PAGE ELEMENTS #NAVBAR
+ * ------------------------------ */
+#navbar {width:auto; display:block; height:24px;} 
+#navbar ul, #navbar ul li{ padding:0; margin:0; list-style:none; foat:left;}
+#navbar a{color:#FFFFFF; font-weight:bold;}
+#navbar li a:link, #navbar li a:visited {background:#000077; text-decoration:none; height:24px; line-height:24px; display:inline; float:left; width:auto; padding:0px 10px;}
+#navbar a:hover{color:#777777;}
+
 .landingInput {
         width: 80px
 }
