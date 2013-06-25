@@ -151,7 +151,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
             echo "<td>$storedTakeoffTime</td>";
         else {
             echo "<td><input type=\"text\" name=\"takeoff\" value=\"$storedTakeoffTime\" class=\"takeoffInput\" id=\"takeoff{$row['flightIndex']}\"/>";
-            echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='clock.png' border='0'></a></td>";
+            echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='img/clock.png' border='0'></a></td>";
         }
         $storedTakeoffTime = "";
 
@@ -163,7 +163,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
             echo "<td>$storedLandingTime</td>";
         else {
             echo "<td><input type=\"text\" name=\"landing\" value=\"$storedLandingTime\" class=\"landingInput\" id=\"landing{$row['flightIndex']}\" />";
-            echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='clock.png' border='0'></a></td>";
+            echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='img/clock.png' border='0'></a></td>";
         }
         $storedLandingTime = "";
 

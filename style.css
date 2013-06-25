@@ -9,7 +9,7 @@ table, td, th {
 body {  
         font-family: Verdana, Arial;
         font-size: 16px;
-        background-image: url(Clouds.jpg);
+        background-image: url(img/Clouds.jpg);
 }
 
 
@@ -99,7 +99,7 @@ tr.CompleteEntry {
 th, tr.Head {
         color: #FFFFFF;
         background-color: #000077;
-        background-image: url('grad_white.png');
+        background-image: url('img/grad_white.png');
         background-position: 0px -3px;
         background-repeat: repeat-x;
         vertical-align: bottom;
@@ -116,7 +116,7 @@ button.delete {
         width: 24px;
         valign: center;
         background: transparent;
-        background-image: url('close_24.png');
+        background-image: url('img/close_24.png');
         background-position: center;
 }
 
@@ -126,7 +126,7 @@ button.modify {
         width: 24px;
         valign: center;
         background: transparent;
-        background-image: url('modify.png');
+        background-image: url('img/modify.png');
         background-position: center;
 }
 
