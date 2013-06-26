@@ -49,24 +49,38 @@
         <ul>
         <li><a href="index.php">Logging Home</a></li>
         <li><a href="index.php?reports">Reports Page</a></li>
-        <li><a href="index.php?addpilots">Add Pilots/Aircraft</a></li>
+        <li><a href="index.php?addpilots">Add/Edit Pilots</a></li>
+        <li><a href="index.php?addplanes">Add/Edit Aircraft</a></li>
         <li><a href="http://prescottsoaring.com">Back to PSS Homepage</a></li>
         </ul>
     </div>
 
     <div id="main">
         <?php
+            $startTime = microtime(true);
+    
             if(isset($_GET['reports'])) {
-                // include page interests
                 include('reports.php');
-                // in all other cases include the home page
+            }
+            else if(isset($_GET['addpilots'])) {
+                include('addpilots.php'); 
             } 
             else {
+                // in all other cases include the home page
                 include('home.php');
             }
         ?>
         <div class="spacer" />
     </div>
+    <div id="footer">
+        <?php 
+            $stopTime = microtime(true);
+            $time = round($stopTime - $startTime, 4);
+            $thisYear = date("Y");
+            print("Page generated in $time seconds.  &copy $thisYear Prescott Soaring Society"); 
+        ?>
+    </div>
+
 </div>
 </body>
 </html>

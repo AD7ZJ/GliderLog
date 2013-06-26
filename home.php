@@ -239,6 +239,4 @@ The format for entering times is very flexible - anything like "11:00", "1:00 PM
 To Do Yet:<br>
 <ul>
 <li>'other' entry in the aircraft column for visiting pilots (no air-time will be calculated for these)
-<li>Source code can be seen <a href="index.phps">here</a>
-<li>The sQlite database admin panel can be seen <a href="phpliteadmin.php">here</a>
 </ul>  

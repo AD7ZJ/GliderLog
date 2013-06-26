@@ -18,10 +18,10 @@ body {
  * ------------------------------ */
 
 /* 
- * #container has an absolute width (780 pixel) 
- * The width of inner elements is set to auto,
- * in this way all inner elements have the same 
- * width of the element which contains them 
+ * #container can set an absolute width.
+ * The width of inner elements should be set to auto,
+ * so each inner element will have the same 
+ * width of the element which contains it.
  * */
 
 #container {width:auto; margin:0 auto;}
@@ -36,15 +36,9 @@ body {
 #main{width:auto; display:block;}
 #column_left{width:560px; margin-right:20px; float:left;}
 #column_right{width:200px; float:left;}
-
-/* 
- * div.spacer, solve an issue with #container height
- * in css 2 column layout. 
- * */
-
 div.spacer{clear:both; height:10px; display:block;}
 
-#footer{width:auto; display:block; height:24px;}
+#footer{width:auto; display:block; height:24px; font-size:10px;}
 
 .landingInput {
         width: 80px

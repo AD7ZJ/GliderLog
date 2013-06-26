@@ -50,14 +50,31 @@
         }
 
         public function GetAircraft() {
-            return array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
+            //return array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
+            $query = "SELECT * FROM aircraft;";
+            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
+
+            $planes = array( );
+            while($row = $result->fetch(PDO::FETCH_BOTH)) {
+                $planes[$row['ID']] = $row['Name'];
+            }
+
+            return $planes;
 
         }
 
-        public function GetMembers() {
-            $query = "SELECT * FROM pilots;";
-            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
+        /**
+         * Returns an array of all the members in the database
+         *
+         * @param $showInactive If true, inactive members will be included in the array
+         */
+        public function GetMembers($showInactive = false) {
+            if($showInactive)
+                $query = "SELECT * FROM pilots;";
+            else
+                $query = "SELECT * FROM pilots WHERE Inactive=0;";
 
+            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
             $memberList = array( );
             while($row = $result->fetch(PDO::FETCH_BOTH)) {
                 $memberList[$row['ID']] = $row['Name'];
