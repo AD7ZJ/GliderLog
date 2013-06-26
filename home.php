@@ -236,7 +236,3 @@ To begin the log for the day, only the pilot's name need be entered to begin wit
 <br>
 The format for entering times is very flexible - anything like "11:00", "1:00 PM", and "14:30" is acceptable.  "now" will automatically enter the current time in.  To delete an entry, click the red 'X'.  When a row is complete, the background will turn green.  Data is stored in a sQlite database, which offers the generic SQL interface for running reports on the data.  <br>
 <br>
-To Do Yet:<br>
-<ul>
-<li>'other' entry in the aircraft column for visiting pilots (no air-time will be calculated for these)
-</ul>  

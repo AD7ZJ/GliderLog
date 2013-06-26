@@ -11,6 +11,9 @@
 
         // name of the database table used to store the member list in
         private $pilotTable = "pilots";
+
+        // name of the database table used to store the aircraft list in
+        private $aircraftTable = "aircraft";
     
         /******************** Public properties ********************/
         public $dbObj;
@@ -47,6 +50,10 @@
         public function GetPilotTable() {
             return $this->pilotTable;
 
+        }
+
+        public function GetAircraftTable() {
+            return $this->aircraftTable;
         }
 
         public function GetAircraft() {

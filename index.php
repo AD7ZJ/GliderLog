@@ -64,7 +64,11 @@
             }
             else if(isset($_GET['addpilots'])) {
                 include('addpilots.php'); 
-            } 
+            }
+            else if(isset($_GET['addplanes'])) {
+                include('addplanes.php');
+            }
+ 
             else {
                 // in all other cases include the home page
                 include('home.php');

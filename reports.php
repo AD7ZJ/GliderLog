@@ -199,10 +199,3 @@ function OutputQueryResults($query = "") {
 
 
 ?>
-
-<br>
-To Do Yet:<br>
-<ul>
-<li>Implement date range
-<li>Source code can be seen <a href="index.phps">here</a>
-</ul>  
