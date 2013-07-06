@@ -81,7 +81,12 @@
             $stopTime = microtime(true);
             $time = round($stopTime - $startTime, 4);
             $thisYear = date("Y");
-            print("Page generated in $time seconds.  &copy $thisYear Prescott Soaring Society"); 
+            $load = sys_getloadavg();
+            $oneMinLoad = $load[0];
+            $fiveMinLoad = $load[1];
+            $fifteenMinLoad = $load[2];
+            print("&copy $thisYear Prescott Soaring Society.  "); 
+            print("Page generated in $time seconds. Load avg: $oneMinLoad $fiveMinLoad $fifteenMinLoad");
         ?>
     </div>
 

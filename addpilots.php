@@ -42,7 +42,13 @@ if($pilotID && !$modified) {
 }
 else if($pilotName) {
     // Add a new pilot to the database
-    print("Adding new pilot...");
+    $query = "INSERT INTO $tableName (ID, Name, LastBiAnnual, Inactive) VALUES (NULL, '$pilotName', NULL, 0);";
+
+    if(!$result = $database->query($query, SQLITE_BOTH, $error))
+        print("uh oh.... query failed :( $error $result");
+
+    // refresh the member list
+    $memberList = $logbase->GetMembers(true);
 }
 
 // print out the list of existing pilots
@@ -51,6 +57,8 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td>Member Name</td><td>Last Flew</td><td>Last Bi-annual</td><td>Inactive</td><td></td></tr>\n");
 
+    // skip the first row (it should be null)
+    $row = $result->fetch(PDO::FETCH_BOTH);
     while($row = $result->fetch(PDO::FETCH_BOTH)) {
         $editMe = 0;
         // do we need to modify this row?

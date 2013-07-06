@@ -42,7 +42,13 @@ if($aircraftID && !$modified) {
 }
 else if($aircraftName) {
     // Add a new airplane to the database
-    print("Adding new airplane... named $aircraftName");
+    $query = "INSERT INTO $tableName (ID, Name, LastAnnualed, IsAvailable) VALUES (NULL, '$aircraftName', NULL, 'available');";
+
+    if(!$result = $database->query($query, SQLITE_BOTH, $error))
+        print("uh oh.... query failed :( $error $result");
+
+    // refresh the member list
+    $aircraftList = $logbase->GetAircraft(true);
 }
 
 // print out the list of existing aircraft
@@ -51,6 +57,8 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("<table id=\"aircraftTable\" >");
     echo("<tr class=\"Head\"><td>Aircraft Name</td><td>Last Annualed</td><td>IsAvailable</td><td></td></tr>\n");
 
+    // skip the first row (it should be null)
+    $row = $result->fetch(PDO::FETCH_BOTH);
     while($row = $result->fetch(PDO::FETCH_BOTH)) {
         $editMe = 0;
         // do we need to modify this row?

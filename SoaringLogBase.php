@@ -56,9 +56,12 @@
             return $this->aircraftTable;
         }
 
-        public function GetAircraft() {
+        public function GetAircraft($showNotAvail = false) {
             //return array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
-            $query = "SELECT * FROM aircraft;";
+            if($showNotAvail)
+                $query = "SELECT * FROM aircraft;";
+            else
+                $query = "SELECT * FROM aircraft WHERE IsAvailable='available';";
             $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
 
             $planes = array( );
@@ -104,7 +107,7 @@
         }
 
         public function GetInstructors() {
-            return array( "", "None", "A.C. Goodwin" );
+            return array( "", "None", "A.C. Goodwin", "Max Denney");
 
         }
    
