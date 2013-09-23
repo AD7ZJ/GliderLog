@@ -103,7 +103,7 @@ $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
 if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
-    echo("<td>Tow Height</td><td>Notes</td><td></td></tr>\n");
+    echo("<td>Tow Height</td><td></td></tr>\n");
 
     while($row = $result->fetch(PDO::FETCH_BOTH)) {
         $editMe = 0;
@@ -179,10 +179,10 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
 
         // notes
         if(($row['notes'] && !$editMe) || $entryComplete) {
-            echo "<td style=\"width: 200px\">{$row['notes']}</td>";
+            //echo "<td style=\"width: 200px\">{$row['notes']}</td>";
         }
         else {
-            echo "<td><input type=\"text\" name=\"notes\" value=\"{$row['notes']}\"/></td>";
+            //echo "<td><input type=\"text\" name=\"notes\" value=\"{$row['notes']}\"/></td>";
         }
 
         // Submit button and hidden field containing the unique flight index
@@ -204,7 +204,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo "<tr><form name=\"logging\" action=\"index.php\" method=\"POST\">\n";
     echo "<td>";
     echo $logbase->PrintPilots() . "</td>\n";
-    echo "<td colspan=\"7\">Add a name to enter these fields</td>";
+    echo "<td colspan=\"6\">Add a name to enter these fields</td>";
     echo "<td><input type=\"submit\" value=\"Submit\" /></td>";
     echo "</form></tr>";
     echo("</table><br><br><br>");
