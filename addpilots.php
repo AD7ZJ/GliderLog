@@ -22,6 +22,10 @@ $modified = $_REQUEST["modified"];
 // update an existing record
 if($pilotID && !$modified) {
     $query = "UPDATE $tableName SET ";
+
+    if($pilotName)
+        $query .= "Name='$pilotName',";
+
     if($lastBiannual)
         $query .= "LastBiAnnual='$lastBiannual',";
 
@@ -39,6 +43,9 @@ if($pilotID && !$modified) {
         print("uh oh.... failed to update record :( $error");
         print $query;
     }
+
+    // refresh the member list
+    $memberList = $logbase->GetMembers(true);
 }
 else if($pilotName) {
     // Add a new pilot to the database
@@ -76,7 +83,13 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
         }
 
         // Pilot
-        echo("<td>{$memberList[$row['ID']]}</td>");
+        if($editMe) {
+            echo("<td>");
+            echo("<input type=\"text\" name=\"pilotName\" value=\"{$memberList[$row['ID']]}\" id=\"pilotName{$row['ID']}\"/>");
+            echo "</td>";
+        }
+        else 
+            echo("<td>{$memberList[$row['ID']]}</td>");
 
         // Last flew
         $lastFlew = $logbase->GetLastFlew($row['ID']);

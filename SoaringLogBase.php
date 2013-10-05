@@ -99,7 +99,7 @@
          * @param ID of pilot to check
          */
         public function GetLastFlew($id) {
-            $query = "SELECT * FROM flightLog WHERE billTo='$id' ORDER BY flightIndex DESC LIMIT 1;";
+            $query = "SELECT * FROM flightLog WHERE billTo='$id' AND takeoffTime IS NOT NULL AND landingTime IS NOT NULL ORDER BY flightIndex DESC LIMIT 1;";
             $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
 
             $row = $result->fetch(PDO::FETCH_BOTH);
