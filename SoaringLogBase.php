@@ -80,9 +80,9 @@
          */
         public function GetMembers($showInactive = false) {
             if($showInactive)
-                $query = "SELECT * FROM pilots;";
+                $query = "SELECT * FROM pilots ORDER BY Name;";
             else
-                $query = "SELECT * FROM pilots WHERE Inactive=0;";
+                $query = "SELECT * FROM pilots WHERE Inactive=0 ORDER BY Name;";
 
             $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
             $memberList = array( );

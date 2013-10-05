@@ -102,7 +102,7 @@ else if($billTo) {
 $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
 if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("<table id=\"flightLogTable\" >");
-    echo("<tr class=\"Head\"><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
+    echo("<tr class=\"Head\"><td></td><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
     echo("<td>Tow Height</td><td></td></tr>\n");
 
     while($row = $result->fetch(PDO::FETCH_BOTH)) {
@@ -114,12 +114,23 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
 
         // is this an incomplete entry?
         if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || !$row['towHeight'] || $editMe) {
-            echo("<tr id=\"row{$row['flightIndex']}\" class=\"IncompleteEntry\"><form id=\"form{$row['flightIndex']}\" name=\"loggingUpdate\" action=\"index.php\" method=\"POST\"> ");
+            echo("<tr id=\"row{$row['flightIndex']}\" class=\"IncompleteEntry\">");
             $entryComplete = false;
         }
         else {
             echo("<tr class=\"CompleteEntry\">");
             $entryComplete = true;
+        }
+
+        echo "<td><center><button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />\n";
+
+        echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
+        echo "</center></td>\n";
+
+        // start the update form if the entry is incomplete
+        if (!$entryComplete) {
+            echo "<form id=\"form{$row['flightIndex']}\" name=\"loggingUpdate\" action=\"index.php\" method=\"POST\">";
+
         }
 
         // Pilot
@@ -187,25 +198,23 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
 
         // Submit button and hidden field containing the unique flight index
         if(!$entryComplete) {
-            echo "<td><input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
-            echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
-            echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" /></td></tr>\n";
+            echo "<td><input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form></td>\n";
         }
         else {
-            echo "<td><center><button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />\n";
+            echo "<td></td>\n";
+        } 
 
-            echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
-            echo "</center></td></tr>\n";
-        }
+        // end of the row
+        echo "</tr>";
 
     }
 
     // Row for new entries...
     echo "<tr><form name=\"logging\" action=\"index.php\" method=\"POST\">\n";
-    echo "<td>";
+    echo "<td></td><td>";
     echo $logbase->PrintPilots() . "</td>\n";
-    echo "<td colspan=\"6\">Add a name to enter these fields</td>";
-    echo "<td><input type=\"submit\" value=\"Submit\" /></td>";
+    echo "<td><input type=\"submit\" value=\"<-- Add name to list\" /></td>";
+    echo "<td colspan=\"5\"></td>";
     echo "</form></tr>";
     echo("</table><br><br><br>");
 }
@@ -223,12 +232,31 @@ function AddEntry($billTo) {
         . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', NULL, NULL, NULL, "
         . "NULL, NULL, '$billTo', NULL, NULL);";
 
-    //FIXME:checkDuplicates($dayOfYear, $billTo, $takeoff, $landing);
+    if(CheckDupes($year, $dayOfYear, $billTo)) {
+        if(!$result = $database->query($query, SQLITE_BOTH, $error))
+            print("uh oh.... query failed :( $error $result");
+    }
+}
+
+function CheckDupes($year, $dayOfYear, $billTo) {
+    global $tableName, $database;
+
+    $query = "SELECT * FROM $tableName WHERE year='$year' AND dayOfYear='$dayOfYear' AND billTo='$billTo';";
+
     if(!$result = $database->query($query, SQLITE_BOTH, $error))
         print("uh oh.... query failed :( $error $result");
 
+    while($row = $result->fetch(PDO::FETCH_BOTH)) {
+        if($row['takeoffTime'] && $row['landingTime']) {
+            continue;
+        }
+        else
+            return false;
+    }
 
+    return true;
 }
+
 
 ?>
 
