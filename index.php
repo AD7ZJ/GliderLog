@@ -8,28 +8,33 @@
         new JsDatePick({
             useMode:2,
             target:"startDatePilot",
-            dateFormat:"%d-%M-%Y"
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
         });
         new JsDatePick({
             useMode:2,
             target:"endDatePilot",
-            dateFormat:"%d-%M-%Y"
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
         });
 
         new JsDatePick({
             useMode:2,
             target:"startDateA",
-            dateFormat:"%d-%M-%Y"
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
         });
         new JsDatePick({
             useMode:2,
             target:"endDateA",
-            dateFormat:"%d-%M-%Y"
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
         });
         new JsDatePick({
             useMode:2,
             target:"flyingDay",
-            dateFormat:"%d-%M-%Y"
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
         });
 
     };

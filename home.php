@@ -51,18 +51,11 @@ if($flightIndex && !$modified) {
     if($aircraft)
         $query .= "aircraft='$aircraft',";
 
-    if($takeoff) {
+    if($takeoff) 
         $query .= "takeoffTime='$takeoff',";
-        $totalTime = $row['landingTime'] - $takeoff;
-        $query .= "totalTime='$totalTime',";
-    }
 
-    if($landing) {
+    if($landing) 
         $query .= "landingTime='$landing',";
-        // update the flight time
-        $totalTime = $landing - $row['takeoffTime'];
-        $query .= "totalTime='$totalTime',";
-    }
 
     if($towHeight)
         $query .= "towHeight='$towHeight',";
@@ -76,6 +69,19 @@ if($flightIndex && !$modified) {
     if($notes)
         $query .= "notes='$notes',";
 
+    if($takeoff || $landing) {
+        if($takeoff && $landing)
+            $totalTime = $landing - $takeoff;
+        else {
+            if($row['takeoffTime'])
+                $totalTime = $landing - $row['takeoffTime'];
+            else if ($row['landingTime'])
+                $totalTime = $row['landingTime'] - $takeoff;
+            else
+                $totalTime = 0;
+        }
+        $query .= "totalTime='$totalTime',"; 
+    }
 
     // trim any trailing commas off the string so far
     $query = rtrim($query, ",");

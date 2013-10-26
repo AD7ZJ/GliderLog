@@ -30,7 +30,7 @@ function updateFlightTime() {
             // build elapsed flight time string
             row.cells[6].innerHTML = "";
             if(flightTimeHours > 0)
-                row.cells[5].innerHTML += flightTimeHours + ":";
+                row.cells[6].innerHTML += flightTimeHours + ":";
             row.cells[6].innerHTML += pad(flightTimeMinutes, 2) + ":" + pad(totalTimeSeconds, 2);
         }
     }
