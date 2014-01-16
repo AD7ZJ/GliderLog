@@ -36,6 +36,19 @@
             dateFormat:"%d-%M-%Y",
             weekStartDay:0
         });
+        new JsDatePick({
+            useMode:2,
+            target:"startDateRange",
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
+        });
+        new JsDatePick({
+            useMode:2,
+            target:"endDateRange",
+            dateFormat:"%d-%M-%Y",
+            weekStartDay:0
+        });
+
 
     };
 </script>

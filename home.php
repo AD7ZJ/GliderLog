@@ -128,8 +128,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
             $entryComplete = true;
         }
 
-        echo "<td><center><button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />\n";
-
+        echo "<td><center>";
         echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
         echo "</center></td>\n";
 
@@ -203,13 +202,14 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
         }
 
         // Submit button and hidden field containing the unique flight index
+        echo "<td>";
         if(!$entryComplete) {
-            echo "<td><input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form></td>\n";
+            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
         }
-        else {
-            echo "<td></td>\n";
-        } 
 
+        echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />";
+
+        echo "</td>\n";
         // end of the row
         echo "</tr>";
 

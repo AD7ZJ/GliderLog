@@ -33,6 +33,8 @@ if(!$startDate)
 if(!$endDate)
     $endDate = strtotime($_REQUEST["endDateA"]);
 
+$startDateRange = strtotime($_REQUEST["startDateRange"]);
+$endDateRange = strtotime($_REQUEST["endDateRange"]);
 
 /************ Display flights by pilot ***********/
 echo("<form action=\"index.php?reports\" method=\"POST\">");
@@ -79,6 +81,7 @@ echo("<td><input type=\"submit\" value=\"Go!\" /></td>");
 echo("</tr></table>");
 echo("</form>");
 
+/************ Display flights by a single day ***********/
 echo("<form action=\"index.php?reports\" method=\"POST\"> ");
 echo("<table>");
 echo("<tr>");
@@ -91,6 +94,19 @@ echo("<td><input type=\"submit\" value=\"Go!\" /></td>");
 echo("</tr></table>");
 echo("</form>");
 
+/************ Display flights by a range of days ***********/
+echo("<form action=\"index.php?reports\" method=\"POST\"> ");
+echo("<table>");
+echo("<tr>");
+echo("<td class=\"Heading\" colspan=\"3\">Flight Billing<br><br></td>");
+echo("</tr><tr>");
+echo("<td>Start date</td><td>End Date</td>");
+echo("</tr><tr>");
+echo("<td><input type=\"text\" size=\"12\" id=\"startDateRange\" name=\"startDateRange\" /></td>");
+echo("<td><input type=\"text\" size=\"12\" id=\"endDateRange\" name=\"endDateRange\" /></td>");
+echo("<td><input type=\"submit\" value=\"Go!\" /></td>");
+echo("</tr></table>");
+echo("</form>");
 
 
 /************ Display flights by day ***********/
@@ -122,12 +138,86 @@ if($flyingDay) {
     OutputQueryResults($query);
 }
 
+if($startDateRange) {
+    if($endDateRange)
+        $endDateRange = $endDateRange + 86400;
+//    $query = "SELECT * FROM $tableName WHERE takeoffTime >= '$startDateRange' AND takeoffTime < '$endDateRange' ;";
+//    OutputQueryResults($query);
+    $query = "SELECT * FROM $tableName WHERE takeoffTime >= '$startDateRange' AND takeoffTime < '$endDateRange' ORDER BY billTo;";
+    OutputBilling($query);
+}
+
+
+function OutputBilling($query = "") {
+    global $database;
+    global $aircraftList;
+    global $memberList;
+    global $instructorList;
+    global $billTo;
+
+	if($result = $database->query($query, SQLITE_BOTH, $error)) {
+	    echo("<table id=\"flightLogTable\" border=\"1\">");
+	    echo("<tr class=\"Head\">");
+        echo("<td >Bill To</td>");
+        echo("<td >Date</td>");
+        echo("<td >Aircraft</td>");
+        echo("<td >Flight Time</td>");
+        echo("<td >Total</td>");
+        echo("</tr>\n");
+
+	    $currentMember = 0;
+	    $totalTime = 0; // flight time in seconds
+        $flightCount = 0;
+        while($row = $result->fetch(PDO::FETCH_BOTH)) {
+            // don't print if there's no takeoff time
+            if($row['takeoffTime']) {
+                if($row['billTo'] ==  $currentMember) {
+                    echo("<tr class=\"Data\">");
+                }
+                else {
+                    if($flightCount) {
+                        echo "<tr class=\"SubHighlight\"><td></td><td></td><td></td><td></td><td>Total Flights: $flightCount</td></tr>";
+                    }
+                    $flightCount = 0;
+                    echo("<tr class=\"Highlight\"><td colspan=\"5\">");
+                    echo $memberList[$row['billTo']];
+                    echo("</td></tr><tr class=\"Data\">");
+                }
+
+                $flightCount++;
+
+                echo("<td></td>");
+                $storedTakeoffTime = date("F j, Y", $row['takeoffTime']);
+                echo("<td>$storedTakeoffTime</td>");
+                echo("<td>{$aircraftList[$row['aircraft']]}</td>");
+
+                if($row['landingTime']) {
+                    $flightMins = round(($row['landingTime'] - $row['takeoffTime']) / 60);
+                }
+
+                echo("<td>$flightMins Mins</td>");
+                echo("<td></td>");
+                $currentMember = $row['billTo'];
+                echo "</tr>";
+            }
+        }
+        if($flightCount) {
+            echo "<tr class=\"SubHighlight\"><td></td><td></td><td></td><td></td><td>Total Flights: $flightCount</td></tr>";
+        }
+
+	    echo "</table>";
+	}
+    else
+	    print("Failed to execute query: $query  Sucks to be you! $error");
+
+}
 
 function OutputQueryResults($query = "") {
     global $database;
     global $aircraftList;
     global $memberList;
     global $instructorList;
+    global $billTo;
 
 	if($result = $database->query($query, SQLITE_BOTH, $error)) {
 	    echo("<table id=\"flightLogTable\" border=\"1\">");
@@ -189,7 +279,8 @@ function OutputQueryResults($query = "") {
             }
         }
 	    echo "</table>";
-	    echo "<br><b>Total flight time for $memberList[$billTo] over the displayed period: " . round($totalTime / 3600, 1) . "</b>";	
+        if($billTo)
+    	    echo "<br><b>Total flight time for {$memberList[$billTo]} over the displayed period: " . round($totalTime / 3600, 1) . "</b>";	
 	
 	
 	}

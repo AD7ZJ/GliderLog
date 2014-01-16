@@ -70,6 +70,12 @@ tr.Data {
         border-top: 1px solid #999999;
 }
 
+tr.SubHighlight {
+        background-color: #DDDDDF;
+        border-top: 1px solid #999999;
+        font-weight: bold;
+}
+
 tr.IncompleteEntry {
         background-color: #FF0000;
         border-top: 1px solid #999999;
@@ -108,7 +114,7 @@ button.delete {
         border: none;
         height: 24px;
         width: 24px;
-        valign: center;
+        valign: left;
         background: transparent;
         background-image: url('img/close_24.png');
         background-position: center;
