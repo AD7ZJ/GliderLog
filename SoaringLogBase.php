@@ -181,7 +181,7 @@
             if($result = $this->dbObj->query($query, SQLITE_BOTH, $error)) {
                 $row = $result->fetch(PDO::FETCH_BOTH);
 
-                if($row['aircraft'] && $row['takeoffTime'] && $row['landingTime'] && $row['towHeight']) {
+                if($row['aircraft'] && $row['takeoffTime'] && $row['landingTime'] ) {
                     return true;
                 }
             }

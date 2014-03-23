@@ -109,7 +109,7 @@ $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
 if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td></td><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
-    echo("<td>Tow Height</td><td></td></tr>\n");
+    echo("<td></td></tr>\n");
 
     while($row = $result->fetch(PDO::FETCH_BOTH)) {
         $editMe = 0;
@@ -119,7 +119,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
         }
 
         // is this an incomplete entry?
-        if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || !$row['towHeight'] || $editMe) {
+        if(!$row['aircraft'] || !$row['takeoffTime'] || !$row['landingTime'] || $editMe) {
             echo("<tr id=\"row{$row['flightIndex']}\" class=\"IncompleteEntry\">");
             $entryComplete = false;
         }
@@ -188,10 +188,10 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
         echo "<td>$flightMins Mins</td>";
 
         // Tow altitude
-        if($row['towHeight'] && !$editMe)
+        /*if($row['towHeight'] && !$editMe)
             echo("<td>{$row['towHeight']}</td>");
         else
-            echo "<td><input type=\"number\" name=\"towHeight\" value=\"{$row['towHeight']}\" class=\"towInput\" /></td>";
+            echo "<td><input type=\"number\" name=\"towHeight\" value=\"{$row['towHeight']}\" class=\"towInput\" /></td>"; */
 
         // notes
         if(($row['notes'] && !$editMe) || $entryComplete) {
@@ -220,7 +220,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo "<td></td><td>";
     echo $logbase->PrintPilots() . "</td>\n";
     echo "<td><input type=\"submit\" value=\"<-- Add name to list\" /></td>";
-    echo "<td colspan=\"5\"></td>";
+    echo "<td colspan=\"4\"></td>";
     echo "</form></tr>";
     echo("</table><br><br><br>");
 }
