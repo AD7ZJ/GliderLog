@@ -35,8 +35,8 @@ if($aircraftID && !$modified) {
 
     $query .= " WHERE ID='$aircraftID';";
 
-    if(!$result = $database->query($query, SQLITE_BOTH, $error)) {
-        print("uh oh.... failed to update record :( $error");
+    if(!$result = $database->query($query)) {
+        print("uh oh.... failed to update record :( ");
         print $query;
     }
 }
@@ -44,8 +44,8 @@ else if($aircraftName) {
     // Add a new airplane to the database
     $query = "INSERT INTO $tableName (ID, Name, LastAnnualed, IsAvailable) VALUES (NULL, '$aircraftName', NULL, 'available');";
 
-    if(!$result = $database->query($query, SQLITE_BOTH, $error))
-        print("uh oh.... query failed :( $error $result");
+    if(!$result = $database->query($query))
+        print("uh oh.... query failed :( $result");
 
     // refresh the member list
     $aircraftList = $logbase->GetAircraft(true);
@@ -53,7 +53,7 @@ else if($aircraftName) {
 
 // print out the list of existing aircraft
 $query = "SELECT * FROM $tableName;";
-if($result = $database->query($query, SQLITE_BOTH, $error)) {
+if($result = $database->query($query)) {
     echo("<table id=\"aircraftTable\" >");
     echo("<tr class=\"Head\"><td>Aircraft Name</td><td>Last Annualed</td><td>IsAvailable</td><td></td></tr>\n");
 
@@ -126,6 +126,6 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("</table><br><br><br>");
 }
 else
-    print("Failed to execute query!!!  Sucks to be you! $error");
+    print("Failed to execute query!!!");
 
 ?>

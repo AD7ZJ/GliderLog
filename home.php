@@ -12,9 +12,22 @@ $memberList = $logbase->GetMembers();
 $instructorList = $logbase->GetInstructors(); 
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
-$day = date("j");
-$month = date("n");
-$year = date("Y");
+
+if($_REQUEST["day"])
+    $day = $_REQUEST["day"];
+else
+    $day = date("j");
+
+if($_REQUEST["month"])
+    $month = $_REQUEST["month"];
+else
+    $month = date("n");
+
+if($_REQUEST["year"])
+    $year = $_REQUEST["year"];
+else
+    $year = date("Y");
+
 $dayOfYear = date("z");
 $takeoff = strtotime($_REQUEST["takeoff"]); // Times are stored in seconds after the unix epoch
 $landing = strtotime($_REQUEST["landing"]);
@@ -27,11 +40,16 @@ $flightIndex = $_REQUEST["flightIndex"];
 $modified = $_REQUEST["modified"];
 
 // force the time to assume PM if the hour is between 00:00 and 06:00
-if(date("G", $takeoff) < 6)
-    $takeoff += 43200;
-if(date("G", $landing) < 6)
-    $landing += 43200;
+if($takeoff) {
+    if(date("G", $takeoff) < 6)
+        $takeoff += 43200;
+}
+if($landing) {
+    if(date("G", $landing) < 6)
+        $landing += 43200;
+}
 
+print "$month / $day / $year";
 
 // Calculate total flight time
 $totalTime = $landing - $takeoff;
@@ -40,7 +58,7 @@ $totalTime = $landing - $takeoff;
 if($flightIndex && !$modified) {
     // Get existing properties for this flight
     $query = "SELECT * FROM $tableName WHERE flightIndex='$flightIndex';";
-    if($result = $database->query($query, SQLITE_BOTH, $error)) {
+    if($result = $database->query($query)) {
         $row = $result->fetch(PDO::FETCH_BOTH); 
     }
 
@@ -88,8 +106,8 @@ if($flightIndex && !$modified) {
 
     $query .= " WHERE flightIndex='$flightIndex';";
 
-    if(!$result = $database->query($query, SQLITE_BOTH, $error)) {
-        print("uh oh.... failed to update record :( $error");
+    if(!$result = $database->query($query)) {
+        print("uh oh.... failed to update record :( ");
         print $query;
     }
 
@@ -106,7 +124,7 @@ else if($billTo) {
 
 
 $query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
-if($result = $database->query($query, SQLITE_BOTH, $error)) {
+if($result = $database->query($query)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td></td><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
     echo("<td></td></tr>\n");
@@ -147,8 +165,12 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
             echo $logbase->PrintInstructors($row['instructor']);
             echo "</td>";
         }
-        else
+        else if($row['instructor']) {
             echo("<td>{$instructorList[$row['instructor']]}</td>");
+        }
+        else {
+            echo("<td></td>");
+        }
 
         // Glider
         if($row['aircraft'] == 0 || $editMe) {
@@ -225,7 +247,7 @@ if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("</table><br><br><br>");
 }
 else
-print("Failed to execute query!!!  Sucks to be you! $error");
+print("Failed to execute query!!!");
 
 
 function AddEntry($billTo) {
@@ -239,8 +261,8 @@ function AddEntry($billTo) {
         . "NULL, NULL, '$billTo', NULL, NULL);";
 
     if(CheckDupes($year, $dayOfYear, $billTo)) {
-        if(!$result = $database->query($query, SQLITE_BOTH, $error))
-            print("uh oh.... query failed :( $error $result");
+        if(!$result = $database->query($query))
+            print("uh oh.... query failed :( $result");
     }
 }
 
@@ -249,8 +271,8 @@ function CheckDupes($year, $dayOfYear, $billTo) {
 
     $query = "SELECT * FROM $tableName WHERE year='$year' AND dayOfYear='$dayOfYear' AND billTo='$billTo';";
 
-    if(!$result = $database->query($query, SQLITE_BOTH, $error))
-        print("uh oh.... query failed :( $error $result");
+    if(!$result = $database->query($query))
+        print("uh oh.... query failed :( $result");
 
     while($row = $result->fetch(PDO::FETCH_BOTH)) {
         if($row['takeoffTime'] && $row['landingTime']) {

@@ -155,7 +155,7 @@ function OutputBilling($query = "") {
     global $instructorList;
     global $billTo;
 
-	if($result = $database->query($query, SQLITE_BOTH, $error)) {
+	if($result = $database->query($query)) {
 	    echo("<table id=\"flightLogTable\" border=\"1\">");
 	    echo("<tr class=\"Head\">");
         echo("<td >Bill To</td>");
@@ -219,7 +219,7 @@ function OutputQueryResults($query = "") {
     global $instructorList;
     global $billTo;
 
-	if($result = $database->query($query, SQLITE_BOTH, $error)) {
+	if($result = $database->query($query)) {
 	    echo("<table id=\"flightLogTable\" border=\"1\">");
 	    echo("<tr class=\"Head\">");
         echo("<td >Bill To</td>");

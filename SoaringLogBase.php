@@ -4,7 +4,7 @@
         private static $instance;
 
         // Name of the database to use.  Must be prefaced with 'sqlite:' to indicate this is a SQLite database
-        private $dbDir = 'sqlite:/home/elijah/ad7zj/logging/myDatabase.sqlite';
+        private $dbDir = 'sqlite:/var/www/symbolshifters.com/logging/GliderLog/myDatabase.sqlite';
         
         // name of the database table used to store the flight time information
         private $flightLogTable = "flightLog";
@@ -61,8 +61,8 @@
             if($showNotAvail)
                 $query = "SELECT * FROM aircraft;";
             else
-                $query = "SELECT * FROM aircraft WHERE IsAvailable='available';";
-            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
+                $query = "SELECT * FROM aircraft WHERE IsAvailable='available' OR ID=0;";
+            $result = $this->dbObj->query($query);
 
             $planes = array( );
             while($row = $result->fetch(PDO::FETCH_BOTH)) {
@@ -70,7 +70,6 @@
             }
 
             return $planes;
-
         }
 
         /**
@@ -84,7 +83,7 @@
             else
                 $query = "SELECT * FROM pilots WHERE Inactive=0 ORDER BY Name;";
 
-            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
+            $result = $this->dbObj->query($query);
             $memberList = array( );
             while($row = $result->fetch(PDO::FETCH_BOTH)) {
                 $memberList[$row['ID']] = $row['Name'];
@@ -100,7 +99,7 @@
          */
         public function GetLastFlew($id) {
             $query = "SELECT * FROM flightLog WHERE billTo='$id' AND takeoffTime IS NOT NULL AND landingTime IS NOT NULL ORDER BY flightIndex DESC LIMIT 1;";
-            $result = $this->dbObj->query($query, SQLITE_BOTH, $error);
+            $result = $this->dbObj->query($query);
 
             $row = $result->fetch(PDO::FETCH_BOTH);
             return $row['takeoffTime'];
@@ -178,7 +177,7 @@
          */    
         public function EntryIsComplete($flightIndex = 0) {
             $query = "SELECT * FROM flightLog WHERE flightIndex='$flightIndex';";
-            if($result = $this->dbObj->query($query, SQLITE_BOTH, $error)) {
+            if($result = $this->dbObj->query($query)) {
                 $row = $result->fetch(PDO::FETCH_BOTH);
 
                 if($row['aircraft'] && $row['takeoffTime'] && $row['landingTime'] ) {
@@ -196,7 +195,7 @@
         public function DeleteEntry($flightIndex = 0) {
             if($flightIndex != 0) {
                 $query = "DELETE FROM flightLog WHERE flightIndex='$flightIndex';";
-                if($result = $this->dbObj->query($query, SQLITE_BOTH, $error)) 
+                if($result = $this->dbObj->query($query)) 
                     return true;
                 else {
                     print("Failed to execute query!!! $error");
