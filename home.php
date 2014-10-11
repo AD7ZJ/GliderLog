@@ -105,7 +105,7 @@ else if($billTo) {
 }
 
 
-$query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
+$query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear' AND year='$year';";
 if($result = $database->query($query, SQLITE_BOTH, $error)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td></td><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
