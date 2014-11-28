@@ -107,7 +107,7 @@
         }
 
         public function GetInstructors() {
-            return array( "", "None", "Max Denney");
+            return array( "", "None", "Max Denney", "Mark Rebholz");
 
         }
    
