@@ -1,5 +1,3 @@
-<center><h1>Flights for <?php echo date("F j, Y"); ?></h1></center>
-
 <?php
 include("SoaringLogBase.php");
 
@@ -38,6 +36,9 @@ $notes = $_REQUEST["notes"];
 $aircraft = $_REQUEST["aircraft"];
 $flightIndex = $_REQUEST["flightIndex"];
 $modified = $_REQUEST["modified"];
+
+$todaysDate = date("F j, Y");
+print "<center><h1>Flights for $month/$day/$year</h1></center>";
 
 // force the time to assume PM if the hour is between 00:00 and 06:00
 if($takeoff) {
@@ -123,7 +124,7 @@ else if($billTo) {
 }
 
 
-$query = "SELECT * FROM $tableName WHERE dayOfYear='$dayOfYear';";
+$query = "SELECT * FROM $tableName WHERE day='$day' AND month='$month' AND year='$year';";
 if($result = $database->query($query)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td></td><td>Bill To</td><td>Instructor</td><td>Aircraft</td><td>Takeoff Time</td><td>Landing Time</td><td>Flight Time</td>");
@@ -260,16 +261,16 @@ function AddEntry($billTo) {
         . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', NULL, NULL, NULL, "
         . "NULL, NULL, '$billTo', NULL, NULL);";
 
-    if(CheckDupes($year, $dayOfYear, $billTo)) {
+    if(CheckDupes($year, $day, $month, $billTo)) {
         if(!$result = $database->query($query))
             print("uh oh.... query failed :( $result");
     }
 }
 
-function CheckDupes($year, $dayOfYear, $billTo) {
+function CheckDupes($year, $day, $month, $billTo) {
     global $tableName, $database;
 
-    $query = "SELECT * FROM $tableName WHERE year='$year' AND dayOfYear='$dayOfYear' AND billTo='$billTo';";
+    $query = "SELECT * FROM $tableName WHERE year='$year' AND day='$day' AND month='$month' AND billTo='$billTo';";
 
     if(!$result = $database->query($query))
         print("uh oh.... query failed :( $result");
