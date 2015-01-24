@@ -9,7 +9,7 @@ $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
 $tableName = $logbase->GetFlightLogTable();
 $aircraftList = $logbase->GetAircraft();
-$memberList = $logbase->GetMembers();
+$memberList = $logbase->GetMembers(true);
 $instructorList = $logbase->GetInstructors();
 
 
@@ -234,9 +234,11 @@ function OutputQueryResults($query = "") {
 
 	    $currentDOY = 0;
 	    $totalTime = 0; // flight time in seconds
+        $flightCount = 0;
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
             // don't print if there's no takeoff time
             if($row['takeoffTime']) {
+                $flightCount = $flightCount + 1;
                 if(date("z", $row['takeoffTime']) ==  $currentDOY) {
                     echo("<tr class=\"Data\">");
                 }
@@ -279,8 +281,8 @@ function OutputQueryResults($query = "") {
             }
         }
 	    echo "</table>";
-        if($billTo)
-    	    echo "<br><b>Total flight time for {$memberList[$billTo]} over the displayed period: " . round($totalTime / 3600, 1) . "</b>";	
+    	echo "<br><b>Total flight time for {$memberList[$billTo]} over the displayed period: " . round($totalTime / 3600, 1) . " hours.";
+        echo "<br>$flightCount flights </b>";	
 	
 	
 	}

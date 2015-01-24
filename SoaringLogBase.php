@@ -106,7 +106,7 @@
         }
 
         public function GetInstructors() {
-            return array( "", "None", "A.C. Goodwin", "Max Denney");
+            return array( "", "None", "Max Denney", "AC Goodwin", "Mark Rebholz");
 
         }
    
