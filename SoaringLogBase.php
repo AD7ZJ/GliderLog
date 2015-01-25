@@ -4,7 +4,7 @@
         private static $instance;
 
         // Name of the database to use.  Must be prefaced with 'sqlite:' to indicate this is a SQLite database
-        private $dbDir = 'sqlite:/var/www/symbolshifters.com/logging/GliderLog/myDatabase.sqlite';
+        private $dbDir = 'sqlite:myDatabase.sqlite';
         
         // name of the database table used to store the flight time information
         private $flightLogTable = "flightLog";

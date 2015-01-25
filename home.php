@@ -1,6 +1,9 @@
 <?php
 include("SoaringLogBase.php");
 
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
+
 // Initialize variable we'll be using from the database
 $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
@@ -50,7 +53,7 @@ if($landing) {
         $landing += 43200;
 }
 
-print "$month / $day / $year";
+//print "$month / $day / $year";
 
 // Calculate total flight time
 $totalTime = $landing - $takeoff;
@@ -262,8 +265,10 @@ function AddEntry($billTo) {
         . "NULL, NULL, '$billTo', NULL, NULL);";
 
     if(CheckDupes($year, $day, $month, $billTo)) {
-        if(!$result = $database->query($query))
+        if(!$result = $database->query($query)) {
             print("uh oh.... query failed :( $result");
+            print var_export($database->errorinfo());
+        }
     }
 }
 
