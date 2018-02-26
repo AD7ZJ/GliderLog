@@ -4,7 +4,7 @@
         private static $instance;
 
         // Name of the database to use.  Must be prefaced with 'sqlite:' to indicate this is a SQLite database
-        private $dbDir = 'sqlite:myDatabase.sqlite';
+        private $dbDir = 'sqlite:db.sqlite';
         
         // name of the database table used to store the flight time information
         private $flightLogTable = "flightLog";
@@ -106,7 +106,7 @@
         }
 
         public function GetInstructors() {
-            return array( "", "None", "Max Denney", "AC Goodwin", "Mark Rebholz");
+            return array( "", "None", "Max Denney", "AC Goodwin", "Mark Rebholz", "Bill Thrift", "Cliff Hilty", "Scott Bragg");
 
         }
    
