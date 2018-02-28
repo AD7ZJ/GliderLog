@@ -29,9 +29,14 @@ if($_REQUEST["year"])
 else
     $year = date("Y");
 
+$landingTimeString = $_REQUEST["landing"];
+preg_match('/^now$|^\d+\:\d+$|^\d+:\d+:\d+$/', $landingTimeString, $matches);
+$landing = strtotime($matches[0]);  // . " $day-$month-$year");
+
+$takeoffTimeString = $_REQUEST["takeoff"];
+preg_match('/^now$|^\d+\:\d+$|^\d+:\d+:\d+$/', $takeoffTimeString, $matches);
+$takeoff = strtotime($matches[0]);  // . " $day-$month-$year"); // Times are stored in seconds after the unix epoch
 $dayOfYear = date("z");
-$takeoff = strtotime($_REQUEST["takeoff"]); // Times are stored in seconds after the unix epoch
-$landing = strtotime($_REQUEST["landing"]);
 $towHeight = $_REQUEST["towHeight"];
 $billTo = $_REQUEST["billTo"];
 $instructor = $_REQUEST["instructor"];
@@ -40,7 +45,6 @@ $aircraft = $_REQUEST["aircraft"];
 $flightIndex = $_REQUEST["flightIndex"];
 $modified = $_REQUEST["modified"];
 
-$todaysDate = date("F j, Y");
 print "<center><h1>Flights for $month/$day/$year</h1></center>";
 
 // force the time to assume PM if the hour is between 00:00 and 06:00
