@@ -57,11 +57,6 @@ if($landing) {
         $landing += 43200;
 }
 
-//print "$month / $day / $year";
-
-// Calculate total flight time
-$totalTime = $landing - $takeoff;
-
 // update an existing record
 if($flightIndex && !$modified) {
     // Get existing properties for this flight
@@ -80,8 +75,11 @@ if($flightIndex && !$modified) {
     if($takeoff) 
         $query .= "takeoffTime='$takeoff',";
 
-    if($landing) 
-        $query .= "landingTime='$landing',";
+    if($landing) {
+        // update landing time only if landing time is after takeoff time
+        if($row['takeoffTime'] < $landing)
+            $query .= "landingTime='$landing',";
+    }
 
     if($towHeight)
         $query .= "towHeight='$towHeight',";
