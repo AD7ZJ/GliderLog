@@ -269,7 +269,8 @@ function OutputQueryResults($query = "") {
 
                 echo("<td>$flightMins Mins</td>");
                 echo("<td>{$row['towHeight']}</td>");
-                    echo("<td style=\"width: 200px\">{$row['notes']}</td>");
+                //echo("<td>{$row['flightIndex']}</td>");
+                echo("<td style=\"width: 200px\">{$row['notes']}</td>");
 
                 $storedLandingTime = "";
                 $storedTakeoffTime = "";

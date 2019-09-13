@@ -1,5 +1,6 @@
 <?php
 include("SoaringLogBase.php");
+date_default_timezone_set('America/Phoenix');
 
 //error_reporting(E_ALL);
 //ini_set('display_errors', '1');
@@ -235,7 +236,7 @@ if($result = $database->query($query)) {
             echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
         }
 
-        echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />";
+        echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry for {$memberList[$row['billTo']]}?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />";
 
         echo "</td>\n";
         // end of the row
@@ -244,6 +245,7 @@ if($result = $database->query($query)) {
     }
 
     // Row for new entries...
+    echo "</table><br><table id=\"addPilotForm\">";
     echo "<tr><form name=\"logging\" action=\"index.php\" method=\"POST\">\n";
     echo "<td></td><td>";
     echo $logbase->PrintPilots() . "</td>\n";
