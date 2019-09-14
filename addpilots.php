@@ -59,7 +59,7 @@ else if($pilotName) {
 }
 
 // print out the list of existing pilots
-$query = "SELECT * FROM $tableName;";
+$query = "SELECT * FROM $tableName ORDER BY Inactive, ID";
 if($result = $database->query($query)) {
     echo("<table id=\"flightLogTable\" >");
     echo("<tr class=\"Head\"><td>Member Name</td><td>Last Flew</td><td>Last Bi-annual</td><td>Inactive</td><td></td></tr>\n");
@@ -78,7 +78,12 @@ if($result = $database->query($query)) {
             $entryComplete = false;
         }
         else {
-            echo("<tr class=\"CompleteEntry\">");
+            if ($row['Inactive']) {
+                echo("<tr class=\"InactivePilot\">");
+            }
+            else {
+                echo("<tr class=\"CompleteEntry\">");
+            }
             $entryComplete = true;
         }
 

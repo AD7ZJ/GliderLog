@@ -86,6 +86,11 @@ tr.CompleteEntry {
         border-top: 1px solid #999999;
 }
 
+tr.InactivePilot {
+        background-color: #EEE1DE;
+        border-top: 1px solid #999999;
+}
+
 .Highlight {
         background-color: #DDDDDF;
         font-weight: bold;
