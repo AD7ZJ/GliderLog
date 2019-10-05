@@ -14,7 +14,10 @@
 
         // name of the database table used to store the aircraft list in
         private $aircraftTable = "aircraft";
-    
+ 
+        // name of the database table used to store the maintenance list in
+        private $maintTable = "maintenance";
+   
         /******************** Public properties ********************/
         public $dbObj;
         
@@ -56,6 +59,10 @@
             return $this->aircraftTable;
         }
 
+        public function GetMaintTable() {
+            return $this->maintTable;
+        }
+
         public function GetAircraft($showNotAvail = false) {
             //return array( "", "SGS 1-26", "SGS 2-33", "SGS 1-34", "Cirrus" );
             if($showNotAvail)
@@ -90,6 +97,22 @@
             }
             
             return $memberList;
+        }
+
+        /**
+         * Returns an array of all the maintenance items in the database
+         *
+         */
+        public function GetMaint() {
+            $query = "SELECT * FROM maintenance ORDER BY ID;";
+
+            $result = $this->dbObj->query($query);
+            $maintList = array( );
+            while($row = $result->fetch(PDO::FETCH_BOTH)) {
+                $maintList[$row['ID']] = $row['ID'];
+            }
+            
+            return $maintList;
         }
 
         /**
@@ -169,6 +192,27 @@
             $output .= "</select>";
             return $output;
         }
+
+        /**
+         * Prints a drop down box of pilots to be included in an HTML form
+         *
+         * @param $selected 0 based index of which pilot should be initially selected
+         *
+         * @return String containing formatted HTML
+         */ 
+        public function PrintMaintLogTypes($selected = "") {
+            $logTypeList = array( "", "PER TOW", "PER HOUR 1-26", "PER HOUR 1-34");
+            $output = "<select name=\"logType\">\n";
+            foreach($logTypeList as $i => $value) {
+                $output .= "<option value=\"$value\" ";
+                if(strcmp($selected, $value) == 0)
+                    $output .= "selected=\"selected\"";
+                $output .= ">$value</option>\n";
+            }
+            $output .= "</select>";
+            return $output;
+        }
+
 
         /**
          * Returns true if the flight entry is complete, false otherwise

@@ -69,6 +69,7 @@
         <li><a href="index.php?reports">Reports Page</a></li>
         <li><a href="index.php?addpilots">Add/Edit Pilots</a></li>
         <li><a href="index.php?addplanes">Add/Edit Aircraft</a></li>
+        <li><a href="index.php?maintenance">Maintenance</a></li>
         <li><a href="http://prescottsoaring.com">Back to PSS Homepage</a></li>
         </ul>
     </div>
@@ -85,6 +86,9 @@
             }
             else if(isset($_GET['addplanes'])) {
                 include('addplanes.php');
+            }
+            else if(isset($_GET['maintenance'])) {
+                include('maintenance.php');
             }
  
             else {
@@ -103,7 +107,7 @@
             $oneMinLoad = $load[0];
             $fiveMinLoad = $load[1];
             $fifteenMinLoad = $load[2];
-            print("&copy 2013 - $thisYear Prescott Soaring Society.  "); 
+            print("&copy 2013 - $thisYear Prescott Area Soaring.  "); 
             print("Page generated in $time seconds. Load avg: $oneMinLoad $fiveMinLoad $fifteenMinLoad");
         ?>
     </div>
