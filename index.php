@@ -76,7 +76,7 @@
 
     <div id="main">
         <?php
-            $startTime = microtime(true);
+            $startTimeExecTime = microtime(true);
     
             if(isset($_GET['reports'])) {
                 include('reports.php');
@@ -100,8 +100,8 @@
     </div>
     <div id="footer">
         <?php 
-            $stopTime = microtime(true);
-            $time = round($stopTime - $startTime, 4);
+            $stopTimeExecTime = microtime(true);
+            $time = round($stopTimeExecTime - $startTimeExecTime, 4);
             $thisYear = date("Y");
             $load = sys_getloadavg();
             $oneMinLoad = $load[0];

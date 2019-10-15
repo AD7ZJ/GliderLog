@@ -201,7 +201,7 @@
          * @return String containing formatted HTML
          */ 
         public function PrintMaintLogTypes($selected = "") {
-            $logTypeList = array( "", "PER TOW", "PER HOUR 1-26", "PER HOUR 1-34");
+            $logTypeList = array( "", "PER TOW", "PER AIRCRAFT");
             $output = "<select name=\"logType\">\n";
             foreach($logTypeList as $i => $value) {
                 $output .= "<option value=\"$value\" ";
