@@ -249,7 +249,7 @@ if($result = $database->query($query)) {
         // Submit button and hidden field containing the unique flight index
         echo "<td>";
         if(!$entryComplete) {
-            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"hidden\" name=\"token\" value=\"{$row['token']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
+            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"hidden\" name=\"token\" value=\"{$row['token']}\"/><input type=\"submit\" name=\"updateBtn\" value=\"Update...\" /></form>";
         }
 
         echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry for {$memberList[$row['billTo']]}?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />";

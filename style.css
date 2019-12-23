@@ -3,7 +3,7 @@ table, td, th {
         font-size: 16px;
         border: 0px solid black;
         border-collapse:collapse; 
-        padding-left: 20px
+        padding-left: 20px;
 }
 
 body {  
@@ -118,20 +118,31 @@ th, tr.Head {
 button.delete {
         border: none;
         height: 24px;
-        width: 24px;
-        valign: left;
+        width: 24px; 
         background: transparent;
         background-image: url('img/close_24.png');
+        background-repeat: no-repeat;
         background-position: center;
+        margin-left: 10px;
+        float: right;
+        padding: 31px 0px;
 }
 
 button.modify {
         border: none;
         height: 24px;
         width: 24px;
-        valign: center;
         background: transparent;
         background-image: url('img/modify.png');
         background-position: center;
 }
 
+
+input[type=button], input[type=submit], input[type=text]  {
+        padding: 10px 5px;
+        margin: 10px 0px;
+}
+
+select {
+        padding: 10px 5px;
+}
