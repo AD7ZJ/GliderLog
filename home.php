@@ -79,7 +79,8 @@ if($flightIndex && !$modified) {
         $newToken = uniqid();
         $query .= "token='$newToken',";
 
-        if($aircraft)
+        // aircraft set to 0 or 1 indicates null
+        if($aircraft > 1)
             $query .= "aircraft='$aircraft',";
 
         if($takeoff) 
@@ -114,7 +115,9 @@ if($flightIndex && !$modified) {
                 else
                     $totalTime = 0;
             }
-            $query .= "totalTime='$totalTime',"; 
+            if ($totalTime > 0 && $totalTime < 86400) {
+                $query .= "totalTime='$totalTime',"; 
+            }
         }
 
         // trim any trailing commas off the string so far
@@ -193,7 +196,7 @@ if($result = $database->query($query)) {
         }
 
         // Glider
-        if($row['aircraft'] == 0 || $editMe) {
+        if($row['aircraft'] == 0 ||  $row['aircraft'] == 1 || $editMe) {
             echo "<td>";
             echo $logbase->PrintAircraft($row['aircraft']);
             echo "</td>";
