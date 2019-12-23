@@ -45,6 +45,7 @@ $notes = $_REQUEST["notes"];
 $aircraft = $_REQUEST["aircraft"];
 $flightIndex = $_REQUEST["flightIndex"];
 $modified = $_REQUEST["modified"];
+$token = $_REQUEST["token"];
 
 print "<center><h1>Flights for $month/$day/$year</h1></center>";
 
@@ -66,62 +67,74 @@ if($flightIndex && !$modified) {
         $row = $result->fetch(PDO::FETCH_BOTH); 
     }
 
-    // get the pilot's name for later use
-    $pilotName = $row['billTo'];
+    // If token matches the one in the database
+    if (strcmp($token, $row['token']) == 0)
+    {
+        // get the pilot's name for later use
+        $pilotName = $row['billTo'];
 
-    $query = "UPDATE $tableName SET ";
-    if($aircraft)
-        $query .= "aircraft='$aircraft',";
+        $query = "UPDATE $tableName SET ";
 
-    if($takeoff) 
-        $query .= "takeoffTime='$takeoff',";
+        // create new token
+        $newToken = uniqid();
+        $query .= "token='$newToken',";
 
-    if($landing) {
-        // update landing time only if landing time is after takeoff time
-        if($row['takeoffTime'] < $landing)
-            $query .= "landingTime='$landing',";
-    }
+        if($aircraft)
+            $query .= "aircraft='$aircraft',";
 
-    if($towHeight)
-        $query .= "towHeight='$towHeight',";
+        if($takeoff) 
+            $query .= "takeoffTime='$takeoff',";
 
-    if($instructor) {
-        if($instructor == 1) // 'none' was selected so clear it
-            $instructor = 0;
-        $query .= "instructor='$instructor',";
-    }
-
-    if($notes)
-        $query .= "notes='$notes',";
-
-    if($takeoff || $landing) {
-        if($takeoff && $landing)
-            $totalTime = $landing - $takeoff;
-        else {
-            if($row['takeoffTime'])
-                $totalTime = $landing - $row['takeoffTime'];
-            else if ($row['landingTime'])
-                $totalTime = $row['landingTime'] - $takeoff;
-            else
-                $totalTime = 0;
+        if($landing) {
+            // update landing time only if landing time is after takeoff time
+            if($row['takeoffTime'] < $landing)
+                $query .= "landingTime='$landing',";
         }
-        $query .= "totalTime='$totalTime',"; 
+
+        if($towHeight)
+            $query .= "towHeight='$towHeight',";
+
+        if($instructor) {
+            if($instructor == 1) // 'none' was selected so clear it
+                $instructor = 0;
+            $query .= "instructor='$instructor',";
+        }
+
+        if($notes)
+            $query .= "notes='$notes',";
+
+        if($takeoff || $landing) {
+            if($takeoff && $landing)
+                $totalTime = $landing - $takeoff;
+            else {
+                if($row['takeoffTime'])
+                    $totalTime = $landing - $row['takeoffTime'];
+                else if ($row['landingTime'])
+                    $totalTime = $row['landingTime'] - $takeoff;
+                else
+                    $totalTime = 0;
+            }
+            $query .= "totalTime='$totalTime',"; 
+        }
+
+        // trim any trailing commas off the string so far
+        $query = rtrim($query, ",");
+
+        $query .= " WHERE flightIndex='$flightIndex';";
+
+        if(!$result = $database->query($query)) {
+            print("uh oh.... failed to update record :( ");
+            print $query;
+        }
+
+        // is this entry complete?
+        if($logbase->EntryIsComplete($flightIndex)) {
+            // Add the person to the bottom of the list
+            AddEntry($pilotName);
+        }
     }
-
-    // trim any trailing commas off the string so far
-    $query = rtrim($query, ",");
-
-    $query .= " WHERE flightIndex='$flightIndex';";
-
-    if(!$result = $database->query($query)) {
-        print("uh oh.... failed to update record :( ");
-        print $query;
-    }
-
-    // is this entry complete?
-    if($logbase->EntryIsComplete($flightIndex)) {
-        // Add the person to the bottom of the list
-        AddEntry($pilotName);
+    else {
+        print("Someone else edited the log, page refreshed. Try again.");
     }
 }
 else if($billTo) {
@@ -233,14 +246,14 @@ if($result = $database->query($query)) {
         // Submit button and hidden field containing the unique flight index
         echo "<td>";
         if(!$entryComplete) {
-            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
+            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"hidden\" name=\"token\" value=\"{$row['token']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
         }
 
         echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry for {$memberList[$row['billTo']]}?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />";
 
-        echo "</td>\n";
+        echo "</td>";
         // end of the row
-        echo "</tr>";
+        echo "</tr>\n";
 
     }
 
@@ -264,9 +277,13 @@ function AddEntry($billTo) {
     if($takeoff && $landing)
         $totalTime = $landing - $takeoff;
 
+    $newToken = uniqid();
+    $query .= "token='$newToken',";
+
+
     $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo,"
-        . "instructor,notes) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', NULL, NULL, NULL, "
-        . "NULL, NULL, '$billTo', NULL, NULL);";
+        . "instructor,notes,token) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', NULL, NULL, NULL, "
+        . "NULL, NULL, '$billTo', NULL, NULL, '$newToken');";
 
     if(CheckDupes($year, $day, $month, $billTo)) {
         if(!$result = $database->query($query)) {

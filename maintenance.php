@@ -10,7 +10,7 @@ $thisFile = "index.php?maintenance";
 $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
 $tableName = $logbase->GetMaintTable(); 
-$maintList = $logbase->GetMaint(true); 
+$maintList = $logbase->GetMaint(); 
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
 $maintItem = $_REQUEST["maintItem"];
