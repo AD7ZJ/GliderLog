@@ -6,6 +6,17 @@ include("SoaringLogBase.php");
 // name of this file - used in links
 $thisFile = "index.php?addplanes";
 
+session_start();
+$loggedIn = False;
+if ( isset( $_SESSION['loggedin'] ) ) {
+    $loggedIn = True;
+    print("<h2><a href=\"auth.php?logout=1&origin=addplanes\">Logout</a></h2>");
+}
+else {
+    print("<h2><a href=\"auth.php?origin=addplanes\">Login</a></h2>");
+}
+
+
 // Initialize variable we'll be using from the database
 $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
@@ -19,36 +30,38 @@ $aircraftID = $_REQUEST["aircraftID"];
 $aircraftName = $_REQUEST["aircraftName"];
 $modified = $_REQUEST["modified"];
 
-// update an existing record
-if($aircraftID && !$modified) {
-    $query = "UPDATE $tableName SET ";
-    if($lastAnnualed)
-        $query .= "LastAnnualed='$lastAnnualed',";
+if($loggedIn) {
+    // update an existing record
+    if($aircraftID && !$modified) {
+        $query = "UPDATE $tableName SET ";
+        if($lastAnnualed)
+            $query .= "LastAnnualed='$lastAnnualed',";
 
-    if($available) 
-        $query .= "IsAvailable='$available',";
-    else
-        $query .= "IsAvailable=0";
+        if($available) 
+            $query .= "IsAvailable='$available',";
+        else
+            $query .= "IsAvailable=0";
 
-    // trim any trailing commas off the string
-    $query = rtrim($query, ",");
+        // trim any trailing commas off the string
+        $query = rtrim($query, ",");
 
-    $query .= " WHERE ID='$aircraftID';";
+        $query .= " WHERE ID='$aircraftID';";
 
-    if(!$result = $database->query($query)) {
-        print("uh oh.... failed to update record :( ");
-        print $query;
+        if(!$result = $database->query($query)) {
+            print("uh oh.... failed to update record :( ");
+            print $query;
+        }
     }
-}
-else if($aircraftName) {
-    // Add a new airplane to the database
-    $query = "INSERT INTO $tableName (ID, Name, LastAnnualed, IsAvailable) VALUES (NULL, '$aircraftName', NULL, 'available');";
+    else if($aircraftName) {
+        // Add a new airplane to the database
+        $query = "INSERT INTO $tableName (ID, Name, LastAnnualed, IsAvailable) VALUES (NULL, '$aircraftName', NULL, 'available');";
 
-    if(!$result = $database->query($query))
-        print("uh oh.... query failed :( $result");
+        if(!$result = $database->query($query))
+            print("uh oh.... query failed :( $result");
 
-    // refresh the member list
-    $aircraftList = $logbase->GetAircraft(true);
+        // refresh the member list
+        $aircraftList = $logbase->GetAircraft(true);
+    }
 }
 
 // print out the list of existing aircraft
@@ -110,19 +123,26 @@ if($result = $database->query($query)) {
             echo "<td><input type=\"hidden\" name=\"aircraftID\" value=\"{$row['ID']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
         }
         else {
-            echo "<td><center><button name=\"modify\" class=\"modify\" onClick=\"window.location.href='{$thisFile}&aircraftID={$row['ID']}&modified=1'; \" />";
-            echo "</center></td></tr>\n";
+            if($loggedIn) {
+                echo "<td><center><button name=\"modify\" class=\"modify\" onClick=\"window.location.href='{$thisFile}&aircraftID={$row['ID']}&modified=1'; \" />";
+                echo "</center></td></tr>\n";
+            }
+            else {
+                echo "<td></td></tr>\n";
+            }
         }
 
     }
 
-    // Row for new entries...
-    echo "<tr><form name=\"aircraftList\" action=\"{$thisFile}\" method=\"POST\">\n";
-    echo "<td><input type=\"text\" name=\"aircraftName\" /></td>\n";
-    echo "<td><input type=\"text\" name=\"lastAnnualed\" /></td>\n";
-    echo "<td>N/A</td>";
-    echo "<td><input type=\"submit\" value=\"Add new...\" /></td>";
-    echo "</form></tr>";
+    if($loggedIn) {
+        // Row for new entries...
+        echo "<tr><form name=\"aircraftList\" action=\"{$thisFile}\" method=\"POST\">\n";
+        echo "<td><input type=\"text\" name=\"aircraftName\" /></td>\n";
+        echo "<td><input type=\"text\" name=\"lastAnnualed\" /></td>\n";
+        echo "<td>N/A</td>";
+        echo "<td><input type=\"submit\" value=\"Add new...\" /></td>";
+        echo "</form></tr>";
+    }
     echo("</table><br><br><br>");
 }
 else

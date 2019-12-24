@@ -10,10 +10,10 @@ session_start();
 $loggedIn = False;
 if ( isset( $_SESSION['loggedin'] ) ) {
     $loggedIn = True;
-    print("<h2><a href=\"auth.php?logout=1\">Logout</a></h2>");
+    print("<h2><a href=\"auth.php?logout=1&origin=maintenance\">Logout</a></h2>");
 }
 else {
-    print("<h2><a href=\"login.php\">Login</a></h2>");
+    print("<h2><a href=\"auth.php?origin=maintenance\">Login</a></h2>");
 }
 
 
@@ -247,3 +247,8 @@ else
     print("Failed to execute query!!!");
 
 ?>
+This page allows tracking elapsed tows or elapsed flight time between a range of dates. "PER TOW" will track the total number of launches across all aircraft. "PER AIRCRAFT" will track the number of tows as well as flight hours. Only complete flights (having both a completed takeoff and landing time) are counted. 
+<br>
+Enter dates like "Month, Day, Year". The word "clear" can be used to erase the end date should it be mistakenly entered. A missing end date means the calculations include up to the current time. The maintenance log can only be edited after logging in. 
+<br>
+<br>

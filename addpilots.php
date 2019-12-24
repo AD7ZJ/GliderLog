@@ -6,6 +6,17 @@ include("SoaringLogBase.php");
 // name of this file - used in links
 $thisFile = "index.php?addpilots";
 
+session_start();
+$loggedIn = False;
+if ( isset( $_SESSION['loggedin'] ) ) {
+    $loggedIn = True;
+    print("<h2><a href=\"auth.php?logout=1&origin=addpilots\">Logout</a></h2>");
+}
+else {
+    print("<h2><a href=\"auth.php?origin=addpilots\">Login</a></h2>");
+}
+
+
 // Initialize variable we'll be using from the database
 $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
@@ -19,43 +30,45 @@ $pilotID = $_REQUEST["pilotID"];
 $pilotName = $_REQUEST["pilotName"];
 $modified = $_REQUEST["modified"];
 
-// update an existing record
-if($pilotID && !$modified) {
-    $query = "UPDATE $tableName SET ";
+if($loggedIn) {
+    // update an existing record
+    if($pilotID && !$modified) {
+        $query = "UPDATE $tableName SET ";
 
-    if($pilotName)
-        $query .= "Name='$pilotName',";
+        if($pilotName)
+            $query .= "Name='$pilotName',";
 
-    if($lastBiannual)
-        $query .= "LastBiAnnual='$lastBiannual',";
+        if($lastBiannual)
+            $query .= "LastBiAnnual='$lastBiannual',";
 
-    if($inactive) 
-        $query .= "Inactive='$inactive',";
-    else
-        $query .= "Inactive=0";
+        if($inactive) 
+            $query .= "Inactive='$inactive',";
+        else
+            $query .= "Inactive=0";
 
-    // trim any trailing commas off the string
-    $query = rtrim($query, ",");
+        // trim any trailing commas off the string
+        $query = rtrim($query, ",");
 
-    $query .= " WHERE ID='$pilotID';";
+        $query .= " WHERE ID='$pilotID';";
 
-    if(!$result = $database->query($query)) {
-        print("uh oh.... failed to update record :(");
-        print $query;
+        if(!$result = $database->query($query)) {
+            print("uh oh.... failed to update record :(");
+            print $query;
+        }
+
+        // refresh the member list
+        $memberList = $logbase->GetMembers(true);
     }
+    else if($pilotName) {
+        // Add a new pilot to the database
+        $query = "INSERT INTO $tableName (ID, Name, LastBiAnnual, Inactive) VALUES (NULL, '$pilotName', NULL, 0);";
 
-    // refresh the member list
-    $memberList = $logbase->GetMembers(true);
-}
-else if($pilotName) {
-    // Add a new pilot to the database
-    $query = "INSERT INTO $tableName (ID, Name, LastBiAnnual, Inactive) VALUES (NULL, '$pilotName', NULL, 0);";
+        if(!$result = $database->query($query))
+            print("uh oh.... query failed :( $result");
 
-    if(!$result = $database->query($query))
-        print("uh oh.... query failed :( $result");
-
-    // refresh the member list
-    $memberList = $logbase->GetMembers(true);
+        // refresh the member list
+        $memberList = $logbase->GetMembers(true);
+    }
 }
 
 // print out the list of existing pilots
@@ -135,20 +148,27 @@ if($result = $database->query($query)) {
             echo "<td><input type=\"hidden\" name=\"pilotID\" value=\"{$row['ID']}\"/><input type=\"submit\" value=\"Update...\" /></form>";
         }
         else {
-            echo "<td><center><button name=\"modify\" class=\"modify\" onClick=\"window.location.href='{$thisFile}&pilotID={$row['ID']}&modified=1'; \" />";
-            echo "</center></td></tr>\n";
+            if($loggedIn) {
+                echo "<td><center><button name=\"modify\" class=\"modify\" onClick=\"window.location.href='{$thisFile}&pilotID={$row['ID']}&modified=1'; \" />";
+                echo "</center></td></tr>\n";
+            }
+            else {
+                echo "<td></td></tr>\n";
+            }
         }
 
     }
 
-    // Row for new entries...
-    echo "<tr><form name=\"pilotList\" action=\"{$thisFile}\" method=\"POST\">\n";
-    echo "<td><input type=\"text\" name=\"pilotName\" /></td>\n";
-    echo "<td>N/A</td>\n";
-    echo "<td><input type=\"text\" name=\"lastBiannual\" /></td>\n";
-    echo "<td>N/A</td>";
-    echo "<td><input type=\"submit\" value=\"Add new...\" /></td>";
-    echo "</form></tr>";
+    if($loggedIn) {
+        // Row for new entries...
+        echo "<tr><form name=\"pilotList\" action=\"{$thisFile}\" method=\"POST\">\n";
+        echo "<td><input type=\"text\" name=\"pilotName\" /></td>\n";
+        echo "<td>N/A</td>\n";
+        echo "<td><input type=\"text\" name=\"lastBiannual\" /></td>\n";
+        echo "<td>N/A</td>";
+        echo "<td><input type=\"submit\" value=\"Add new...\" /></td>";
+        echo "</form></tr>";
+    }
     echo("</table><br><br><br>");
 }
 else
