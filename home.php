@@ -14,30 +14,47 @@ $memberList = $logbase->GetMembers();
 $instructorList = $logbase->GetInstructors(); 
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
-
-if($_REQUEST["day"])
+$dateOverride = False;
+if($_REQUEST["day"]) {
     $day = $_REQUEST["day"];
+    $dateOverride = True;
+}
 else
     $day = date("j");
 
-if($_REQUEST["month"])
+if($_REQUEST["month"]) {
     $month = $_REQUEST["month"];
+    $dateOverride = True;
+}
 else
     $month = date("n");
 
-if($_REQUEST["year"])
+if($_REQUEST["year"]) {
     $year = $_REQUEST["year"];
+    $dateOverride = True;
+}
 else
     $year = date("Y");
 
+// Convert the various takeoff/landing time formats to a unix timestamp
 $landingTimeString = $_REQUEST["landing"];
-preg_match('/^now$|^\d+\:\d+$|^\d+:\d+:\d+$/', $landingTimeString, $matches);
-$landing = strtotime($matches[0]);  // . " $day-$month-$year");
+preg_match('/^\d+\:\d+$|^\d+:\d+:\d+$/', $landingTimeString, $matches);
+if($matches[0])
+    $landing = strtotime($matches[0] . " $day-$month-$year");
+preg_match('/^now$/', $landingTimeString, $matches);
+if($matches[0])
+    $landing = strtotime($matches[0]);
 
 $takeoffTimeString = $_REQUEST["takeoff"];
-preg_match('/^now$|^\d+\:\d+$|^\d+:\d+:\d+$/', $takeoffTimeString, $matches);
-$takeoff = strtotime($matches[0]);  // . " $day-$month-$year"); // Times are stored in seconds after the unix epoch
-$dayOfYear = date("z");
+preg_match('/^\d+\:\d+$|^\d+:\d+:\d+$/', $takeoffTimeString, $matches);
+if($matches[0])
+    $takeoff = strtotime($matches[0] . " $day-$month-$year");
+preg_match('/^now$/', $takeoffTimeString, $matches);
+if($matches[0])
+    $takeoff = strtotime($matches[0]);
+
+
+$dayOfYear = date("z", $takeoff);
 $towHeight = $_REQUEST["towHeight"];
 $billTo = $_REQUEST["billTo"];
 $instructor = $_REQUEST["instructor"];
@@ -249,7 +266,13 @@ if($result = $database->query($query)) {
         // Submit button and hidden field containing the unique flight index
         echo "<td>";
         if(!$entryComplete) {
-            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"hidden\" name=\"token\" value=\"{$row['token']}\"/><input type=\"submit\" name=\"updateBtn\" value=\"Update...\" /></form>";
+            echo "<input type=\"hidden\" name=\"flightIndex\" value=\"{$row['flightIndex']}\"/><input type=\"hidden\" name=\"token\" value=\"{$row['token']}\"/>";
+            if ($dateOverride) {
+                echo "<input type=\"hidden\" name=\"day\" value=\"$day\"/>";
+                echo "<input type=\"hidden\" name=\"month\" value=\"$month\"/>";
+                echo "<input type=\"hidden\" name=\"year\" value=\"$year\"/>";
+            }
+            echo "<input type=\"submit\" name=\"updateBtn\" value=\"Update...\" /></form>";
         }
 
         echo "<button name=\"delete\" class=\"delete\" onClick=\"if(confirm('Are you sure you want to delete this entry for {$memberList[$row['billTo']]}?')) window.location.href='deleteEntry.php?flightIndex={$row['flightIndex']}'; \" />";
@@ -265,6 +288,11 @@ if($result = $database->query($query)) {
     echo "<tr><form name=\"logging\" action=\"index.php\" method=\"POST\">\n";
     echo "<td></td><td>";
     echo $logbase->PrintPilots() . "</td>\n";
+    if ($dateOverride) {
+        echo "<input type=\"hidden\" name=\"day\" value=\"$day\"/>";
+        echo "<input type=\"hidden\" name=\"month\" value=\"$month\"/>";
+        echo "<input type=\"hidden\" name=\"year\" value=\"$year\"/>";
+    }
     echo "<td><input type=\"submit\" value=\"<-- Add name to list\" /></td>";
     echo "<td colspan=\"4\"></td>";
     echo "</form></tr>";
