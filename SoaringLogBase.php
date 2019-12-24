@@ -17,6 +17,13 @@
  
         // name of the database table used to store the maintenance list in
         private $maintTable = "maintenance";
+        
+        // username used to login to the admin options
+        private $adminUser = "";
+   
+        // hashed password used to login to the admin options. Uses the php password_hash() function
+        private $adminPass = "";
+   
    
         /******************** Public properties ********************/
         public $dbObj;
@@ -61,6 +68,14 @@
 
         public function GetMaintTable() {
             return $this->maintTable;
+        }
+
+        public function GetAdminUser() {
+            return $this->adminUser;
+        }
+
+        public function GetAdminPass() {
+            return $this->adminPass;
         }
 
         public function GetAircraft($showNotAvail = false) {

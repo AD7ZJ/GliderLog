@@ -6,6 +6,17 @@ include("SoaringLogBase.php");
 // name of this file - used in links
 $thisFile = "index.php?maintenance";
 
+session_start();
+$loggedIn = False;
+if ( isset( $_SESSION['loggedin'] ) ) {
+    $loggedIn = True;
+    print("<h2><a href=\"auth.php?logout=1\">Logout</a></h2>");
+}
+else {
+    print("<h2><a href=\"login.php\">Login</a></h2>");
+}
+
+
 // Initialize variable we'll be using from the database
 $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
@@ -22,50 +33,55 @@ $modified = $_REQUEST["modified"];
 $logAircraft = $_REQUEST["aircraft"];
 
 // update an existing record
-if($maintID && !$modified) {
-    $query = "UPDATE $tableName SET ";
+if($loggedIn) {
+    if($maintID && !$modified) {
+        $query = "UPDATE $tableName SET ";
 
-    if($maintItem)
-        $query .= "maintItem='$maintItem',";
+        if($maintItem)
+            $query .= "maintItem='$maintItem',";
 
-    if($startTime)
-        $query .= "startTime='$startTime',";
+        if($startTime)
+            $query .= "startTime='$startTime',";
 
-    if($endTime) 
-        $query .= "endTime='$endTime',";
+        if (strcmp($_REQUEST["endTime"],"clear") == 0) {
+            $query .= "endTime=NULL,";
+            print("clearing...");
+        }
+        else if($endTime) {
+            $query .= "endTime='$endTime',";
+        }
 
-    if($logType) 
-        $query .= "logType='$logType',";
+        if($logType) 
+            $query .= "logType='$logType',";
 
-    if($logAircraft) 
-        $query .= "logAircraft='$logAircraft',";
+        if($logAircraft) 
+            $query .= "logAircraft='$logAircraft',";
 
-    // trim any trailing commas off the string
-    $query = rtrim($query, ",");
+        // trim any trailing commas off the string
+        $query = rtrim($query, ",");
 
-    $query .= " WHERE ID='$maintID';";
+        $query .= " WHERE ID='$maintID';";
 
-    if(!$result = $database->query($query)) {
-        print("uh oh.... failed to update record :(");
-        print $query;
+        if(!$result = $database->query($query)) {
+            print("uh oh.... failed to update record :(");
+            print $query;
+        }
     }
+    else if($maintItem) {
+        // Add a new maintenance item to the database
+        $query = "INSERT INTO $tableName (ID, maintItem, startTime, endTime, logType, logAircraft) VALUES (NULL, '$maintItem', '$startTime', '$endTime', '$logType', '$logAircraft');";
 
-    // refresh the member list
-    $memberList = $logbase->GetMembers(true);
-}
-else if($maintItem) {
-    // Add a new maintenance item to the database
-    $query = "INSERT INTO $tableName (ID, maintItem, startTime, endTime, logType, logAircraft) VALUES (NULL, '$maintItem', '$startTime', '$endTime', '$logType', '$logAircraft');";
+        if(!$result = $database->query($query))
+            print("uh oh.... query failed :( $result");
 
-    if(!$result = $database->query($query))
-        print("uh oh.... query failed :( $result");
-
-    // refresh the maint list
-    $maintList = $logbase->GetMaint();
+        // refresh the maint list
+        $maintList = $logbase->GetMaint();
+    }
 }
 
 // print out the list of existing entries
-$query = "SELECT * FROM $tableName ORDER BY ID";
+$tableName = $logbase->GetMaintTable(); 
+$query = "SELECT * FROM $tableName ORDER BY ID;";
 if($result = $database->query($query)) {
     echo("<table id=\"maintLogTable\" >");
     echo("<tr class=\"Head\"><td>Maint Item</td><td>Start Date</td><td>End Date</td><td>Log Type</td><td>Log Type Aircraft</td><td></td></tr>\n");
@@ -154,13 +170,18 @@ if($result = $database->query($query)) {
             echo "<td></td>";
         }
 
-        // Submit button and hidden field containing the unique flight index
+        // Submit button and hidden field containing the unique maint index
         if($editMe) {
             echo "<td><input type=\"hidden\" name=\"maintID\" value=\"{$row['ID']}\"/><input type=\"submit\" value=\"Update...\" /></form></td></tr>";
         }
         else {
-            echo "<td><center><button name=\"modify\" class=\"modify\" onClick=\"window.location.href='{$thisFile}&maintID={$row['ID']}&modified=1'; \" />";
-            echo "</center></td></tr>\n";
+            if($loggedIn) {
+                echo "<td><center><button name=\"modify\" class=\"modify\" onClick=\"window.location.href='{$thisFile}&maintID={$row['ID']}&modified=1'; \" />";
+                echo "</center></td></tr>\n";
+            }
+            else {
+                echo "<td></td></tr>\n";
+            }
         }
 
         // Print out entry results
@@ -168,16 +189,16 @@ if($result = $database->query($query)) {
         {
             $tableName = $logbase->GetFlightLogTable();
             $endTime = $row['endTime'];
-            if ($row['endTime'])
+            if (!$endTime)
             {
                 $endTime = strtotime("now");
             }
             $query = "SELECT * FROM '$tableName' WHERE takeoffTime IS NOT NULL AND takeoffTime >= '{$row['startTime']}' AND takeoffTime <= '$endTime' AND aircraft == '{$row['logAircraft']}';";
-            $result = $database->query($query);
+            $acResult = $database->query($query);
 
             $flightCount = 0;
             $totalTime = 0;
-            while($row = $result->fetch(PDO::FETCH_BOTH)) 
+            while($row = $acResult->fetch(PDO::FETCH_BOTH)) 
             {
                 // don't print if there's no takeoff time
                 if($row['takeoffTime'] && $row['landingTime']) 
@@ -205,19 +226,21 @@ if($result = $database->query($query)) {
         }
     }
 
-    // Row for new entries...
-    echo "<tr><form name=\"maintList\" action=\"{$thisFile}\" method=\"POST\">\n";
-    echo "<td><input type=\"text\" name=\"maintItem\" /></td>\n";
-    echo "<td><input type=\"text\" name=\"startDate\" /></td>\n";
-    echo "<td><input type=\"text\" name=\"endDate\" /></td>\n";
-    echo "<td>";
-    echo $logbase->PrintMaintLogTypes();
-    echo "</td>";
-    echo "<td>";
-    echo $logbase->PrintAircraft();
-    echo "</td>";
-    echo "<td><input type=\"submit\" value=\"Add new...\" /></td>";
-    echo "</form></tr>\n";
+    if ($loggedIn) {
+        // Row for new entries...
+        echo "<tr><form name=\"maintList\" action=\"{$thisFile}\" method=\"POST\">\n";
+        echo "<td><input type=\"text\" name=\"maintItem\" /></td>\n";
+        echo "<td><input type=\"text\" name=\"startTime\" /></td>\n";
+        echo "<td><input type=\"text\" name=\"endTime\" /></td>\n";
+        echo "<td>";
+        echo $logbase->PrintMaintLogTypes();
+        echo "</td>";
+        echo "<td>";
+        echo $logbase->PrintAircraft();
+        echo "</td>";
+        echo "<td><input type=\"submit\" value=\"Add new...\" /></td>";
+        echo "</form></tr>\n";
+    }
     echo("</table><br><br><br>");
 }
 else
