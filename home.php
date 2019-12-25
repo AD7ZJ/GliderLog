@@ -187,7 +187,10 @@ if($result = $database->query($query)) {
         }
 
         echo "<td><center>";
-        echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1'; \" />";
+        echo "<button name=\"modify\" class=\"modify\" onClick=\"window.location.href='index.php?flightIndex={$row['flightIndex']}&modified=1";
+        if($dateOverride)
+            echo "&day=$day&month=$month&year=$year";
+        echo "'; \" />";
         echo "</center></td>\n";
 
         // start the update form if the entry is incomplete
@@ -229,7 +232,9 @@ if($result = $database->query($query)) {
             echo "<td>$storedTakeoffTime</td>";
         else {
             echo "<td><input type=\"text\" name=\"takeoff\" value=\"$storedTakeoffTime\" class=\"takeoffInput\" id=\"takeoff{$row['flightIndex']}\"/>";
-            echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='img/clock.png' border='0'></a></td>";
+            if(!$dateOverride)
+                echo "<a href='#' onclick='startTimer({$row['flightIndex']});return false;'><img Title='Click to start the timer' src='img/clock.png' border='0'></a>";
+            echo "</td>";
         }
         $storedTakeoffTime = "";
 
@@ -241,7 +246,9 @@ if($result = $database->query($query)) {
             echo "<td>$storedLandingTime</td>";
         else {
             echo "<td><input type=\"text\" name=\"landing\" value=\"$storedLandingTime\" class=\"landingInput\" id=\"landing{$row['flightIndex']}\" />";
-            echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='img/clock.png' border='0'></a></td>";
+            if(!$dateOverride)
+                echo "<a href='#' onclick='endTimer({$row['flightIndex']});return false;'><img Title='Click to stop the timer' src='img/clock.png' border='0'></a>";
+            echo "</td>";
         }
         $storedLandingTime = "";
 
