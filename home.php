@@ -5,6 +5,21 @@ date_default_timezone_set('America/Phoenix');
 //error_reporting(E_ALL);
 //ini_set('display_errors', '1');
 
+session_start();
+$loggedIn = False;
+if ( isset( $_SESSION['loggedin'] ) ) {
+    $loggedIn = True;
+    print("<h2>To edit a past day, enter the full date below. <a href=\"auth.php?logout=1&origin=home\">Logout</a></h2>");
+
+    echo "<form name=\"setDate\" action=\"index.php\" method=\"POST\">";
+    echo "Day: <input type=\"text\" name=\"day\" value=\"$day\"/>";
+    echo "Month: <input type=\"text\" name=\"month\" value=\"$month\"/>";
+    echo "Year: <input type=\"text\" name=\"year\" value=\"$year\"/>";
+    echo "<input type=\"submit\" value=\"Modify flights for this day\" />";
+    echo "</form>";
+    echo "<br>";
+}
+
 // Initialize variable we'll be using from the database
 $logbase = SoaringLogBase::GetInstance();
 $database = $logbase->dbObj;
@@ -15,21 +30,21 @@ $instructorList = $logbase->GetInstructors();
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
 $dateOverride = False;
-if($_REQUEST["day"]) {
+if($_REQUEST["day"] && $loggedIn) {
     $day = $_REQUEST["day"];
     $dateOverride = True;
 }
 else
     $day = date("j");
 
-if($_REQUEST["month"]) {
+if($_REQUEST["month"] && $loggedIn) {
     $month = $_REQUEST["month"];
     $dateOverride = True;
 }
 else
     $month = date("n");
 
-if($_REQUEST["year"]) {
+if($_REQUEST["year"] && $loggedIn) {
     $year = $_REQUEST["year"];
     $dateOverride = True;
 }
