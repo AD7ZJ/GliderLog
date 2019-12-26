@@ -30,21 +30,21 @@ $instructorList = $logbase->GetInstructors();
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
 $dateOverride = False;
-if($_REQUEST["day"] && $loggedIn) {
+if(isset($_REQUEST["day"]) && $loggedIn) {
     $day = $_REQUEST["day"];
     $dateOverride = True;
 }
 else
     $day = date("j");
 
-if($_REQUEST["month"] && $loggedIn) {
+if(isset($_REQUEST["month"]) && $loggedIn) {
     $month = $_REQUEST["month"];
     $dateOverride = True;
 }
 else
     $month = date("n");
 
-if($_REQUEST["year"] && $loggedIn) {
+if(isset($_REQUEST["year"]) && $loggedIn) {
     $year = $_REQUEST["year"];
     $dateOverride = True;
 }
@@ -52,32 +52,38 @@ else
     $year = date("Y");
 
 // Convert the various takeoff/landing time formats to a unix timestamp
-$landingTimeString = $_REQUEST["landing"];
-preg_match('/^\d+\:\d+$|^\d+:\d+:\d+$/', $landingTimeString, $matches);
-if($matches[0])
-    $landing = strtotime($matches[0] . " $day-$month-$year");
-preg_match('/^now$/', $landingTimeString, $matches);
-if($matches[0])
-    $landing = strtotime($matches[0]);
+$landing = null;
+if (isset($_REQUEST["landing"])) {
+    $landingTimeString = $_REQUEST["landing"];
+    preg_match('/^\d+\:\d+$|^\d+:\d+:\d+$/', $landingTimeString, $matches);
+    if(isset($matches[0]))
+        $landing = strtotime($matches[0] . " $day-$month-$year");
+    preg_match('/^now$/', $landingTimeString, $matches);
+    if(isset($matches[0]))
+        $landing = strtotime($matches[0]);
+}
 
-$takeoffTimeString = $_REQUEST["takeoff"];
-preg_match('/^\d+\:\d+$|^\d+:\d+:\d+$/', $takeoffTimeString, $matches);
-if($matches[0])
-    $takeoff = strtotime($matches[0] . " $day-$month-$year");
-preg_match('/^now$/', $takeoffTimeString, $matches);
-if($matches[0])
-    $takeoff = strtotime($matches[0]);
+$takeoff = null;
+if (isset($_REQUEST["takeoff"])) {
+    $takeoffTimeString = $_REQUEST["takeoff"];
+    preg_match('/^\d+\:\d+$|^\d+:\d+:\d+$/', $takeoffTimeString, $matches);
+    if(isset($matches[0]))
+        $takeoff = strtotime($matches[0] . " $day-$month-$year");
+    preg_match('/^now$/', $takeoffTimeString, $matches);
+    if(isset($matches[0]))
+        $takeoff = strtotime($matches[0]);
+}
 
 
 $dayOfYear = date("z", $takeoff);
-$towHeight = $_REQUEST["towHeight"];
-$billTo = $_REQUEST["billTo"];
-$instructor = $_REQUEST["instructor"];
-$notes = $_REQUEST["notes"];
-$aircraft = $_REQUEST["aircraft"];
-$flightIndex = $_REQUEST["flightIndex"];
-$modified = $_REQUEST["modified"];
-$token = $_REQUEST["token"];
+$towHeight = isset($_REQUEST["towHeight"]) ? $_REQUEST["towHeight"] : null;
+$billTo = isset($_REQUEST["billTo"]) ? $_REQUEST["billTo"] : null;
+$instructor = isset($_REQUEST["instructor"]) ? $_REQUEST["instructor"] : null;
+$notes = isset($_REQUEST["notes"]) ? $_REQUEST["notes"] : null;
+$aircraft = isset($_REQUEST["aircraft"]) ? $_REQUEST["aircraft"] : null;
+$flightIndex = isset($_REQUEST["flightIndex"]) ? $_REQUEST["flightIndex"] : null;
+$modified = isset($_REQUEST["modified"]) ? $_REQUEST["modified"] : null;
+$token = isset($_REQUEST["token"]) ? $_REQUEST["token"] : null;
 
 print "<center><h1>Flights for $month/$day/$year</h1></center>";
 
@@ -327,12 +333,7 @@ print("Failed to execute query!!!");
 function AddEntry($billTo) {
     global $tableName, $day, $month, $year, $dayOfYear, $database;
     
-    if($takeoff && $landing)
-        $totalTime = $landing - $takeoff;
-
     $newToken = uniqid();
-    $query .= "token='$newToken',";
-
 
     $query = "INSERT INTO $tableName (flightIndex,day,month,year,dayOfYear,aircraft,takeoffTime,landingTime,totalTime,towHeight,billTo,"
         . "instructor,notes,token) VALUES (NULL, '$day', '$month', '$year', '$dayOfYear', NULL, NULL, NULL, "
