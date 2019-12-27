@@ -18,23 +18,23 @@ $day = date("j");
 $month = date("n");
 $year = date("Y");
 $dayOfYear = date("z");
-$billTo = $_REQUEST["billTo"];
-$instructor = $_REQUEST["instructor"];
-$aircraft = $_REQUEST["aircraft"];
-$flightIndex = $_REQUEST["flightIndex"];
+$billTo = isset($_REQUEST["billTo"]) ? $_REQUEST["billTo"] : null;
+$instructor = isset($_REQUEST["instructor"]) ? $_REQUEST["instructor"] : null;
+$aircraft = isset($_REQUEST["aircraft"]) ? $_REQUEST["aircraft"] : null;
+$flightIndex = isset($_REQUEST["flightIndex"]) ? $_REQUEST["flightIndex"] : null;
 // only one of these can be set at a time
-$startDate = strtotime($_REQUEST["startDateP"]); // Times are stored in seconds after the unix epoch
-$endDate = strtotime($_REQUEST["endDateP"]);
-$flyingDay = strtotime($_REQUEST["flyingDay"]);
+$startDate = strtotime(isset($_REQUEST["startDateP"]) ? $_REQUEST["startDateP"] : null);
+$endDate = strtotime(isset($_REQUEST["endDateP"]) ? $_REQUEST["endDateP"] : null);
+$flyingDay = strtotime(isset($_REQUEST["flyingDay"]) ? $_REQUEST["flyingDay"] : null);
 
 
 if(!$startDate)
-    $startDate = strtotime($_REQUEST["startDateA"]); // Times are stored in seconds after the unix epoch
+    $startDate = strtotime(isset($_REQUEST["startDateA"]) ? $_REQUEST["startDateA"] : null); // Times are stored in seconds after the unix epoch
 if(!$endDate)
-    $endDate = strtotime($_REQUEST["endDateA"]);
+    $endDate = strtotime(isset($_REQUEST["endDateA"]) ? $_REQUEST["endDateA"] : null);
 
-$startDateRange = strtotime($_REQUEST["startDateRange"]);
-$endDateRange = strtotime($_REQUEST["endDateRange"]);
+$startDateRange = strtotime(isset($_REQUEST["startDateRange"]) ? $_REQUEST["startDateRange"] : null);
+$endDateRange = strtotime(isset($_REQUEST["endDateRange"]) ? $_REQUEST["endDateRange"] : null);
 
 /************ Display flights by pilot ***********/
 echo("<form action=\"index.php?reports\" method=\"POST\">");
@@ -249,7 +249,7 @@ function OutputQueryResults($query = "") {
                 }
 
                 echo("<td>{$memberList[$row['billTo']]}</td>");
-                echo("<td>{$instructorList[$row['instructor']]}</td>");
+                echo("<td>{$instructorList[(isset($row['instructor']) ? $row['instructor'] : 0)]}</td>");
                 echo("<td>{$aircraftList[$row['aircraft']]}</td>");
 
                 if($row['takeoffTime'])
