@@ -24,11 +24,11 @@ $tableName = $logbase->GetAircraftTable();
 $aircraftList = $logbase->GetAircraft(true); 
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
-$available = $_REQUEST["available"];
-$lastAnnualed = strtotime($_REQUEST["lastAnnualed"]);
-$aircraftID = $_REQUEST["aircraftID"];
-$aircraftName = $_REQUEST["aircraftName"];
-$modified = $_REQUEST["modified"];
+$available = isset($_REQUEST["available"]) ? $_REQUEST["available"] : null;
+$lastAnnualed = strtotime(isset($_REQUEST["lastAnnualed"]) ? $_REQUEST["lastAnnualed"] : null);
+$aircraftID = isset($_REQUEST["aircraftID"]) ? $_REQUEST["aircraftID"] : null;
+$aircraftName = isset($_REQUEST["aircraftName"]) ? $_REQUEST["aircraftName"] : null;
+$modified = isset($_REQUEST["modified"]) ? $_REQUEST["modified"] : null;
 
 if($loggedIn) {
     // update an existing record

@@ -24,13 +24,13 @@ $tableName = $logbase->GetMaintTable();
 $maintList = $logbase->GetMaint(); 
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
-$maintItem = $_REQUEST["maintItem"];
-$startTime = strtotime($_REQUEST["startTime"]);
-$endTime = strtotime($_REQUEST["endTime"]);
-$logType = $_REQUEST["logType"];
-$maintID = $_REQUEST["maintID"];
-$modified = $_REQUEST["modified"];
-$logAircraft = $_REQUEST["aircraft"];
+$maintItem = isset($_REQUEST["maintItem"]) ? $_REQUEST["maintItem"] : null;
+$startTime = strtotime(isset($_REQUEST["startTime"]) ? $_REQUEST["startTime"] : null);
+$endTime = strtotime(isset($_REQUEST["endTime"]) ? $_REQUEST["endTime"] : null);;
+$logType = isset($_REQUEST["logType"]) ? $_REQUEST["logType"] : null;
+$maintID = isset($_REQUEST["maintID"]) ? $_REQUEST["maintID"] : null;
+$modified = isset($_REQUEST["modified"]) ? $_REQUEST["modified"] : null;
+$logAircraft = isset($_REQUEST["aircraft"]) ? $_REQUEST["aircraft"] : null;
 
 // update an existing record
 if($loggedIn) {

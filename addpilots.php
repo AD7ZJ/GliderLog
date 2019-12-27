@@ -24,11 +24,11 @@ $tableName = $logbase->GetPilotTable();
 $memberList = $logbase->GetMembers(true); 
 
 // using the _REQUEST array allows input via HTTP POST or URL tags
-$inactive = $_REQUEST["inactive"];
-$lastBiannual = strtotime($_REQUEST["lastBiannual"]);
-$pilotID = $_REQUEST["pilotID"];
-$pilotName = $_REQUEST["pilotName"];
-$modified = $_REQUEST["modified"];
+$inactive = isset($_REQUEST["inactive"]) ? $_REQUEST["inactive"] : null;
+$lastBiannual = strtotime(isset($_REQUEST["lastBiannual"]) ? $_REQUEST["lastBiannual"] : null);
+$pilotID = isset($_REQUEST["pilotID"]) ? $_REQUEST["pilotID"] : null;
+$pilotName = isset($_REQUEST["pilotName"]) ? $_REQUEST["pilotName"] : null;
+$modified = isset($_REQUEST["modified"]) ? $_REQUEST["modified"] : null;
 
 if($loggedIn) {
     // update an existing record
