@@ -114,10 +114,15 @@ if($result = $database->query($query)) {
         if($lastFlew > 1)
             echo("<td>" . date("M j, Y", $lastFlew) . "</td>");
         else
-            echo("<td>N/A</td>");
+            echo("<td>-------</td>");
 
         // Last bi-annual
-        $storedLastBiannual = date("M j, Y", $row['LastBiAnnual']);
+        if ($row['LastBiAnnual'] > 0) {
+            $storedLastBiannual = date("M j, Y", $row['LastBiAnnual']);
+        }
+        else {
+            $storedLastBiannual = "-------";
+        }
         if($editMe) {
             echo("<td>");
             echo("<input type=\"text\" name=\"lastBiannual\" value=\"$storedLastBiannual\" id=\"lastBiannual{$row['ID']}\"/>");
