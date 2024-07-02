@@ -155,9 +155,9 @@ function OutputBilling($query = "") {
     global $instructorList;
     global $billTo;
 
-	if($result = $database->query($query)) {
-	    echo("<table id=\"flightLogTable\" border=\"1\">");
-	    echo("<tr class=\"Head\">");
+    if($result = $database->query($query)) {
+        echo("<table id=\"flightLogTable\" border=\"1\">");
+        echo("<tr class=\"Head\">");
         echo("<td >Bill To</td>");
         echo("<td >Date</td>");
         echo("<td >Aircraft</td>");
@@ -165,8 +165,9 @@ function OutputBilling($query = "") {
         echo("<td >Total</td>");
         echo("</tr>\n");
 
-	    $currentMember = 0;
-	    $totalTime = 0; // flight time in seconds
+	$currentMember = 0;
+	$totalTime = 0;    // flight time in seconds
+	$totalFlights = 0; // total number of flights
         $flightCount = 0;
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
             // don't print if there's no takeoff time
@@ -191,9 +192,12 @@ function OutputBilling($query = "") {
                 echo("<td>$storedTakeoffTime</td>");
                 echo("<td>{$aircraftList[$row['aircraft']]}</td>");
 
-                if($row['landingTime']) {
-                    $flightMins = round(($row['landingTime'] - $row['takeoffTime']) / 60);
-                }
+		if($row['landingTime']) {
+		    $durationInSec = $row['landingTime'] - $row['takeoffTime'];
+		    $flightMins = round($durationInSec / 60);
+		    $totalTime = $totalTime + $durationInSec;
+		    $totalFlights++;
+		}
 
                 echo("<td>$flightMins Mins</td>");
                 echo("<td></td>");
@@ -205,10 +209,15 @@ function OutputBilling($query = "") {
             echo "<tr class=\"SubHighlight\"><td></td><td></td><td></td><td></td><td>Total Flights: $flightCount</td></tr>";
         }
 
-	    echo "</table>";
-	}
-    else
-	    print("Failed to execute query: $query  Sucks to be you! $error");
+	echo "</table>";
+	$totalHours = floor($totalTime / 3600);
+	$mins = round($totalTime % 3600 / 60);
+	echo "Total flight time logged in this date range: $totalHours:$mins<br>"; 
+	echo "Total of $totalFlights flights logged in this date range"; 
+    }
+    else {
+	print("Failed to execute query: $query  Sucks to be you! $error");
+    }
 
 }
 
@@ -219,21 +228,21 @@ function OutputQueryResults($query = "") {
     global $instructorList;
     global $billTo;
 
-	if($result = $database->query($query)) {
-	    echo("<table id=\"flightLogTable\" border=\"1\">");
-	    echo("<tr class=\"Head\">");
+    if($result = $database->query($query)) {
+        echo("<table id=\"flightLogTable\" border=\"1\">");
+        echo("<tr class=\"Head\">");
         echo("<td >Bill To</td>");
         echo("<td >Instructor</td>");
         echo("<td >Aircraft</td>");
         echo("<td >Takeoff Time</td>");
         echo("<td >Landing Time</td>");
         echo("<td >Flight Time</td>");
-	    echo("<td >Tow Height</td>");
+        echo("<td >Tow Height</td>");
         echo("<td >Notes</td>");
         echo("</tr>\n");
 
-	    $currentDOY = 0;
-	    $totalTime = 0; // flight time in seconds
+        $currentDOY = 0;
+        $totalTime = 0; // flight time in seconds
         $flightCount = 0;
         while($row = $result->fetch(PDO::FETCH_BOTH)) {
             // don't print if there's no takeoff time
@@ -277,18 +286,16 @@ function OutputQueryResults($query = "") {
                 $flightMins = 0;
                 // update the current day of year
                 $currentDOY = date("z", $row['takeoffTime']);
-
-                    echo "</tr>";
+                echo "</tr>";
             }
         }
-	    echo "</table>";
-    	echo "<br><b>Total flight time for {$memberList[$billTo]} over the displayed period: " . round($totalTime / 3600, 1) . " hours.";
-        echo "<br>$flightCount flights </b>";	
-	
-	
-	}
-    else
-	    print("Failed to execute query: $query  Sucks to be you! $error");
+        echo "</table>";
+	echo "<br><b>Total flight time for {$memberList[$billTo]} over the displayed period: " . round($totalTime / 3600, 1) . " hours.";
+	echo "<br>$flightCount flights </b>";    
+    }
+    else {
+	print("Failed to execute query: $query  Sucks to be you! $error");
+    }
 }
 
 
