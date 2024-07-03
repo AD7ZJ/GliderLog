@@ -128,7 +128,12 @@ if($result = $database->query($query)) {
         // End Date
         if($editMe) {
             echo("<td>");
-            $storedEndTime = date("F j, Y", $row['endTime']);
+            if($row['endTime'] >= 0) {  
+                $storedEndTime = date("F j, Y", $row['endTime']);
+            }
+            else {
+                $storedEndTime = "---";
+            }
             echo("<input type=\"text\" name=\"endTime\" value=\"{$storedEndTime}\" id=\"endTime{$row['ID']}\"/>");
             echo "</td>";
         }
