@@ -91,6 +91,11 @@ tr.InactivePilot {
         border-top: 1px solid #999999;
 }
 
+tr.InactiveAircraft {
+        background-color: #EEE1DE;
+        border-top: 1px solid #999999;
+}
+
 .Highlight {
         background-color: #DDDDDF;
         font-weight: bold;

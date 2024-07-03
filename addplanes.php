@@ -65,7 +65,7 @@ if($loggedIn) {
 }
 
 // print out the list of existing aircraft
-$query = "SELECT * FROM $tableName;";
+$query = "SELECT * FROM $tableName ORDER BY IsAvailable DESC, ID;";
 if($result = $database->query($query)) {
     echo("<table id=\"aircraftTable\" >");
     echo("<tr class=\"Head\"><td>Aircraft Name</td><td>Last Annualed</td><td>IsAvailable</td><td></td></tr>\n");
@@ -84,7 +84,12 @@ if($result = $database->query($query)) {
             $entryComplete = false;
         }
         else {
-            echo("<tr class=\"CompleteEntry\">");
+            if($row['IsAvailable']) {
+                echo("<tr class=\"CompleteEntry\">");
+            }
+            else {
+                echo("<tr class=\"InactiveAircraft\">");
+            }
             $entryComplete = true;
         }
 
@@ -92,7 +97,12 @@ if($result = $database->query($query)) {
         echo("<td>{$aircraftList[$row['ID']]}</td>");
 
         // Last annual
-        $storedLastAnnual = date("M j, Y", $row['LastAnnualed']);
+        if($row['LastAnnualed'] > 0) {
+            $storedLastAnnual = date("M j, Y", $row['LastAnnualed']);
+        }
+        else {
+            $storedLastAnnual = "-------";
+        }
         if($editMe) {
             echo("<td>");
             echo("<input type=\"text\" name=\"lastAnnualed\" value=\"$storedLastAnnual\" id=\"lastAnnual{$row['ID']}\"/>");
